@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AZ-104 Exam Simulator — Practice Questions</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0f1a;
+            --card: #1a1a2e;
+            --border: #2a2a40;
+            --text: #e0e0f0;
+            --muted: #8888aa;
+            --azure: #0078D4;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --purple: #a855f7;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        .header {
+            background: linear-gradient(135deg, #0078D4 0%, #1a1a2e 100%);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .header h1 { font-size: 2em; margin-bottom: 8px; }
+        .header p { color: var(--muted); font-size: 14px; }
+        .header .badge {
+            display: inline-block;
+            background: rgba(0,120,212,0.3);
+            border: 1px solid var(--azure);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 12px;
+            color: var(--azure);
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+
+        .progress-bar {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .progress-info { display: flex; gap: 24px; }
+        .progress-stat { text-align: center; }
+        .progress-stat .num { font-size: 1.5em; font-weight: 700; }
+        .progress-stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+        .progress-fill-wrap { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 12px; }
+        .progress-fill { height: 100%; background: var(--azure); border-radius: 3px; transition: width 0.3s; }
+
+        .timer { font-family: 'JetBrains Mono', monospace; font-size: 1.3em; color: var(--orange); }
+
+        .question-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        .question-card.active { display: block; }
+        .question-card .domain {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--azure);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .question-card .q-number { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+        .question-card h3 { font-size: 18px; margin-bottom: 20px; line-height: 1.5; }
+        .question-card .scenario {
+            background: #0a0a14;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .options { list-style: none; }
+        .options li {
+            padding: 14px 20px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .options li:hover { border-color: var(--azure); background: rgba(0,120,212,0.05); }
+        .options li.selected { border-color: var(--azure); background: rgba(0,120,212,0.1); }
+        .options li.correct { border-color: var(--green); background: rgba(16,185,129,0.1); }
+        .options li.incorrect { border-color: var(--red); background: rgba(239,68,68,0.1); }
+        .options li .letter {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .hint-box {
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+            font-size: 14px;
+            color: var(--orange);
+        }
+        .hint-box.show { display: block; }
+
+        .explanation-box {
+            background: rgba(16,185,129,0.08);
+            border: 1px solid rgba(16,185,129,0.3);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+            font-size: 14px;
+        }
+        .explanation-box.show { display: block; }
+        .explanation-box h4 { color: var(--green); margin-bottom: 8px; }
+        .explanation-box code { background: #0a0a14; padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+        .btn-row { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-hint { background: rgba(245,158,11,0.15); color: var(--orange); border: 1px solid rgba(245,158,11,0.3); }
+        .btn-hint:hover { background: rgba(245,158,11,0.25); }
+        .btn-check { background: var(--azure); color: white; }
+        .btn-check:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-next { background: var(--green); color: white; }
+        .btn-next:hover { opacity: 0.9; }
+        .btn-reset { background: var(--border); color: var(--text); }
+        .btn-reset:hover { background: #3a3a50; }
+
+        .results {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            display: none;
+        }
+        .results h2 { font-size: 2em; margin-bottom: 16px; }
+        .results .score { font-size: 4em; font-weight: 800; margin: 20px 0; }
+        .results .score.pass { color: var(--green); }
+        .results .score.fail { color: var(--red); }
+        .results .breakdown { display: flex; gap: 24px; justify-content: center; margin-top: 24px; }
+        .results .breakdown .item { text-align: center; }
+        .results .breakdown .item .num { font-size: 1.5em; font-weight: 700; }
+        .results .breakdown .item .label { font-size: 12px; color: var(--muted); }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.5em; }
+            .progress-info { gap: 16px; }
+            .question-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>☁️ AZ-104 Exam Simulator</h1>
+    <p>Azure Administrator Associate — Practice Questions</p>
+    <div class="badge">30 Questions • 120 Minutes • 700/1000 to Pass</div>
+</div>
+
+<div class="container">
+    <div class="progress-bar">
+        <div class="progress-info">
+            <div class="progress-stat">
+                <div class="num" id="current-q">1</div>
+                <div class="label">Question</div>
+            </div>
+            <div class="progress-stat">
+                <div class="num" id="total-q">30</div>
+                <div class="label">Total</div>
+            </div>
+            <div class="progress-stat">
+                <div class="num" id="correct-count">0</div>
+                <div class="label">Correct</div>
+            </div>
+        </div>
+        <div class="timer" id="timer">02:00:00</div>
+        <div class="progress-fill-wrap">
+            <div class="progress-fill" id="progress-fill" style="width: 3.3%"></div>
+        </div>
+    </div>
+
+    <div id="questions-container"></div>
+
+    <div class="results" id="results">
+        <h2>Exam Complete!</h2>
+        <div class="score" id="final-score"></div>
+        <p id="pass-fail-msg"></p>
+        <div class="breakdown">
+            <div class="item"><div class="num" id="r-correct">0</div><div class="label">Correct</div></div>
+            <div class="item"><div class="num" id="r-incorrect">0</div><div class="label">Incorrect</div></div>
+            <div class="item"><div class="num" id="r-time">0</div><div class="label">Time Used</div></div>
+        </div>
+        <div class="btn-row" style="justify-content: center; margin-top: 30px;">
+            <button class="btn btn-reset" onclick="resetExam()">Retake Exam</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {
+        domain: "Identity & Governance (20-25%)",
+        question: "You need to assign a user the ability to manage virtual machines in a resource group but NOT manage networking or storage. Which built-in RBAC role should you assign?",
+        options: [
+            "Virtual Machine Contributor",
+            "Contributor",
+            "Owner",
+            "Reader"
+        ],
+        correct: 0,
+        hint: "Look for the most restrictive role that still allows VM management. 'Contributor' grants too much access.",
+        explanation: "Virtual Machine Contributor lets users manage VMs but not the VNet or storage accounts they're connected to. Contributor (B) grants access to ALL resources in the scope. Owner (C) adds role assignment capability. Reader (D) is view-only. Always follow least-privilege principle."
+    },
+    {
+        domain: "Identity & Governance (20-25%)",
+        question: "You need to ensure that no one can create public IP addresses in a subscription. Which Azure feature should you use?",
+        options: [
+            "Azure Policy with a 'Deny' effect",
+            "Azure RBAC custom role",
+            "Network Security Group",
+            "Azure Firewall"
+        ],
+        correct: 0,
+        hint: "Azure Policy can enforce organizational standards by denying resource creation that doesn't comply with rules.",
+        explanation: "Azure Policy with a 'Deny' effect can prevent the creation of specific resource types (like public IPs) regardless of who tries to create them. RBAC (B) restricts WHO can do things but doesn't prevent specific resource types. NSG (C) filters traffic but doesn't prevent creation. Azure Firewall (D) controls traffic flow, not resource creation."
+    },
+    {
+        domain: "Identity & Governance (20-25%)",
+        question: "A company has multiple Azure subscriptions. They need to apply the same set of policies to all subscriptions. What should they use?",
+        options: [
+            "Management Groups",
+            "Resource Groups",
+            "Azure Blueprints only",
+            "Individual policy assignments per subscription"
+        ],
+        correct: 0,
+        hint: "Management Groups sit ABOVE subscriptions in the Azure hierarchy and allow governance at scale.",
+        explanation: "Management Groups provide a level of scope above subscriptions. You can assign policies and RBAC at the management group level, and they inherit down to all child subscriptions. This is much more efficient than applying policies individually (D). Resource Groups (B) are below subscriptions. Blueprints (C) can help but Management Groups are the primary answer for policy inheritance."
+    },
+    {
+        domain: "Identity & Governance (20-25%)",
+        question: "You need to allow users from a partner organization to access resources in your Azure tenant without creating accounts for them. Which feature should you use?",
+        options: [
+            "Microsoft Entra B2B (Guest Users)",
+            "Microsoft Entra B2C",
+            "Azure AD Connect",
+            "Conditional Access only"
+        ],
+        correct: 0,
+        hint: "B2B = Business-to-Business collaboration (invite external users as guests). B2C = Business-to-Consumer (customer-facing apps).",
+        explanation: "Entra B2B allows you to invite external users as guests. They authenticate using their own organization's credentials but can access your resources. B2C (B) is for consumer applications (social login etc.). AD Connect (C) syncs on-premises AD to cloud. Conditional Access (D) controls sign-in policies but doesn't enable external access by itself."
+    },
+    {
+        domain: "Identity & Governance (20-25%)",
+        question: "Which Entra ID license is required for Conditional Access policies?",
+        options: [
+            "Microsoft Entra ID P1 (or higher)",
+            "Microsoft Entra ID Free",
+            "Microsoft 365 E1",
+            "Azure subscription only (no Entra license needed)"
+        ],
+        correct: 0,
+        hint: "Conditional Access is a premium feature. Free tier doesn't include it.",
+        explanation: "Conditional Access requires at minimum Microsoft Entra ID P1 license. The Free tier includes basic MFA (security defaults) but not Conditional Access policies. P2 adds Identity Protection and PIM. Microsoft 365 E3+ includes P1 licenses."
+    },
+    {
+        domain: "Storage (15-20%)",
+        question: "You need to store 50TB of archival data that is rarely accessed (once per year). Which storage tier provides the LOWEST cost?",
+        options: [
+            "Archive tier",
+            "Cool tier",
+            "Hot tier",
+            "Premium tier"
+        ],
+        correct: 0,
+        hint: "Archive = cheapest storage, most expensive access. For data accessed once per year, storage cost dominates.",
+        explanation: "Archive tier has the lowest storage cost but highest access cost and requires rehydration time (hours). For data accessed once per year, the extremely low storage cost outweighs the rare expensive reads. Cool (B) is for data accessed <30 days. Hot (C) is for frequently accessed data. Premium (D) is for low-latency workloads."
+    },
+    {
+        domain: "Storage (15-20%)",
+        question: "You need to copy 10TB of data from an on-premises file server to Azure Blob Storage. Which tool is the MOST efficient?",
+        options: [
+            "AzCopy",
+            "Azure Storage Explorer (GUI)",
+            "Azure Portal upload",
+            "PowerShell Copy-Item"
+        ],
+        correct: 0,
+        hint: "AzCopy is purpose-built for high-performance data transfer to/from Azure Storage with parallel transfers.",
+        explanation: "AzCopy is a command-line tool optimized for high-throughput data transfers to Azure Storage. It supports parallel uploads, resume after failures, and can handle large datasets efficiently. Storage Explorer (B) uses AzCopy under the hood but adds GUI overhead. Portal (C) has upload limits. Copy-Item (D) isn't designed for Azure blob transfers."
+    },
+    {
+        domain: "Storage (15-20%)",
+        question: "A storage account needs to be accessible only from a specific VNet subnet. How do you configure this?",
+        options: [
+            "Storage account Networking → Firewall: 'Selected networks' → Add the VNet/subnet",
+            "Create a Network Security Group on the subnet",
+            "Use Azure Firewall to filter traffic",
+            "Enable private endpoint only"
+        ],
+        correct: 0,
+        hint: "Storage account firewall (under Networking) allows you to restrict access to specific VNets using Service Endpoints.",
+        explanation: "The storage account's built-in firewall (Networking blade → 'Selected networks') allows you to whitelist specific VNet subnets using Service Endpoints. NSGs (B) filter traffic but can't restrict storage account access specifically. Azure Firewall (C) works but is overkill for this. Private Endpoints (D) provide private IP access but the question asks about VNet restriction, not private connectivity."
+    },
+    {
+        domain: "Storage (15-20%)",
+        question: "Which redundancy option protects against a regional outage?",
+        options: [
+            "GRS (Geo-Redundant Storage) or GZRS",
+            "LRS (Locally-Redundant Storage)",
+            "ZRS (Zone-Redundant Storage)",
+            "None — you need a separate backup solution"
+        ],
+        correct: 0,
+        hint: "Geo-redundant means data is replicated to a secondary REGION hundreds of miles away.",
+        explanation: "GRS replicates data to a secondary region (300+ miles away), protecting against full regional outages. GZRS adds zone redundancy in the primary region. LRS (B) stores 3 copies in one datacenter — no region protection. ZRS (C) spreads across availability zones in ONE region — protects against zone failure but not full region loss."
+    },
+    {
+        domain: "Compute (20-25%)",
+        question: "You need to deploy a VM that can be stopped/deallocated when not in use to save costs, and you need the CHEAPEST option for a dev/test workload. Which VM series should you choose?",
+        options: [
+            "B-series (Burstable)",
+            "D-series (General Purpose)",
+            "F-series (Compute Optimized)",
+            "M-series (Memory Optimized)"
+        ],
+        correct: 0,
+        hint: "B-series VMs accumulate CPU credits when idle and burst when needed — ideal for variable workloads at low cost.",
+        explanation: "B-series (Burstable) VMs are the cheapest option for workloads that don't constantly need full CPU. They accumulate credits during idle periods and burst when needed — perfect for dev/test. D-series (B) is balanced but more expensive. F-series (C) is for CPU-intensive work. M-series (D) is for very large memory workloads (most expensive)."
+    },
+    {
+        domain: "Compute (20-25%)",
+        question: "You need to ensure a VM survives a datacenter failure within a region. What should you configure?",
+        options: [
+            "Deploy the VM to a specific Availability Zone",
+            "Place the VM in an Availability Set",
+            "Use a VM Scale Set",
+            "Enable Azure Backup"
+        ],
+        correct: 0,
+        hint: "Availability Zones = separate physical datacenters within a region. Availability Sets = fault/update domains within ONE datacenter.",
+        explanation: "Availability Zones are physically separate datacenters within a region (own power, cooling, networking). Deploying to a zone protects against datacenter failure. Availability Sets (B) distribute VMs across fault domains within a SINGLE datacenter — protects against rack failure only. VMSS (C) can use zones but isn't required. Backup (D) protects data, not availability."
+    },
+    {
+        domain: "Compute (20-25%)",
+        question: "You have a web app in App Service. You need to test a new version before routing production traffic to it. What should you use?",
+        options: [
+            "Deployment Slots (staging slot) with slot swap",
+            "Create a second App Service Plan",
+            "Use Azure Traffic Manager",
+            "Deploy directly to production during off-hours"
+        ],
+        correct: 0,
+        hint: "Deployment Slots allow you to deploy to a staging slot and then swap it with production with zero downtime.",
+        explanation: "Deployment Slots let you deploy to a non-production slot (e.g., 'staging'), test it, then swap with production. The swap is instant and zero-downtime because it just switches the routing. You can also swap back if issues arise. A second plan (B) wastes resources. Traffic Manager (C) is for geographic routing. Deploying to prod directly (D) risks downtime."
+    },
+    {
+        domain: "Compute (20-25%)",
+        question: "A VMSS needs to automatically add instances when average CPU exceeds 75% for 10 minutes. Which service handles this?",
+        options: [
+            "Azure Monitor Autoscale (with metric-based rules)",
+            "Azure Load Balancer",
+            "Azure Automation runbook",
+            "Manual scaling via portal"
+        ],
+        correct: 0,
+        hint: "Autoscale rules use Azure Monitor metrics to trigger scale-out/scale-in based on thresholds.",
+        explanation: "Azure Monitor Autoscale allows you to define metric-based rules: when 'Percentage CPU > 75 avg 10min' → scale out by 1 instance. Also define scale-in rules (e.g., CPU < 30 → remove instance). Load Balancer (B) distributes traffic but doesn't scale. Automation (C) can scale but isn't purpose-built for it. Manual (D) isn't automatic."
+    },
+    {
+        domain: "Networking (20-25%)",
+        question: "Two VNets (VNet-A: 10.1.0.0/16, VNet-B: 10.2.0.0/16) need to communicate. They are in the same region. What is the simplest solution?",
+        options: [
+            "VNet Peering",
+            "VPN Gateway (site-to-site)",
+            "Azure ExpressRoute",
+            "Deploy a VM as a router between them"
+        ],
+        correct: 0,
+        hint: "VNet Peering provides low-latency, high-bandwidth private connectivity between VNets. No gateways needed.",
+        explanation: "VNet Peering is the simplest and most performant way to connect two VNets. Traffic stays on the Microsoft backbone, low latency, no gateways required. VPN Gateway (B) is for cross-premises or when peering isn't possible. ExpressRoute (C) is for on-premises connectivity. A router VM (D) is complex and adds a single point of failure."
+    },
+    {
+        domain: "Networking (20-25%)",
+        question: "You need to allow HTTP (port 80) traffic from the internet to a subnet but block all other inbound traffic. Where do you configure this?",
+        options: [
+            "Network Security Group (NSG) associated with the subnet",
+            "Azure Firewall",
+            "Application Gateway WAF",
+            "Route table"
+        ],
+        correct: 0,
+        hint: "NSGs filter traffic at the subnet or NIC level with allow/deny rules based on port, protocol, source, destination.",
+        explanation: "NSGs are the primary tool for filtering traffic at layer 3/4. Associate an NSG with the subnet, create an inbound rule: Allow TCP 80 from Any to Any, priority 100. The default rules deny all other inbound internet traffic. Azure Firewall (B) works but is more complex/costly. WAF (C) is layer 7 only. Route tables (D) control routing paths, not filtering."
+    },
+    {
+        domain: "Networking (20-25%)",
+        question: "A company needs a load balancer that can route traffic based on URL paths (e.g., /api to backend pool A, /web to backend pool B). Which service should they use?",
+        options: [
+            "Azure Application Gateway",
+            "Azure Load Balancer (Standard)",
+            "Azure Traffic Manager",
+            "Azure Front Door"
+        ],
+        correct: 0,
+        hint: "URL path-based routing requires a Layer 7 (application layer) load balancer.",
+        explanation: "Application Gateway is a Layer 7 load balancer that supports URL path-based routing, SSL termination, WAF, and cookie-based affinity. Azure Load Balancer (B) is Layer 4 only (TCP/UDP, no URL awareness). Traffic Manager (C) is DNS-based global routing. Front Door (D) also does path routing but is a global CDN/WAF service — Application Gateway is the standard regional answer for this scenario."
+    },
+    {
+        domain: "Networking (20-25%)",
+        question: "You need to resolve private DNS names for resources in a VNet (e.g., vm1.contoso.internal). What should you create?",
+        options: [
+            "Azure Private DNS Zone linked to the VNet",
+            "Azure Public DNS Zone",
+            "Custom DNS server on a VM",
+            "Configure hosts file on each VM"
+        ],
+        correct: 0,
+        hint: "Private DNS Zones provide name resolution within VNets without exposing records to the internet.",
+        explanation: "Azure Private DNS Zones provide DNS resolution within linked VNets. Create a zone (e.g., contoso.internal), link it to your VNet, and add A records. VMs in linked VNets can resolve these names automatically. Public DNS (B) is internet-facing. Custom DNS (C) works but adds management overhead. Hosts files (D) don't scale."
+    },
+    {
+        domain: "Networking (20-25%)",
+        question: "What is the maximum number of NSG rules (inbound + outbound combined) per NSG?",
+        options: [
+            "1000 (default, can be increased to 5000)",
+            "100",
+            "500",
+            "Unlimited"
+        ],
+        correct: 0,
+        hint: "The default limit is 1000 rules per NSG. This includes both inbound and outbound security rules.",
+        explanation: "The default limit is 1000 security rules per NSG (sum of inbound + outbound). This can be increased to 5000 by contacting Azure support. If you're hitting limits, consider consolidating rules using Application Security Groups (ASGs) or Service Tags to reduce rule count."
+    },
+    {
+        domain: "Monitoring (10-15%)",
+        question: "You need to be alerted when a VM's CPU exceeds 90% for more than 5 minutes. Which Azure Monitor feature should you use?",
+        options: [
+            "Metric Alert rule",
+            "Log Alert rule",
+            "Activity Log alert",
+            "Service Health alert"
+        ],
+        correct: 0,
+        hint: "Metric alerts fire based on metric values (like CPU %) crossing a threshold over a time window.",
+        explanation: "Metric Alerts evaluate platform metrics (CPU, memory, disk, etc.) against a threshold over a time period. Configure: metric='Percentage CPU', operator='Greater than', threshold=90, aggregation='Average', period=5 min. Log Alerts (B) query Log Analytics data. Activity Log (C) alerts on management plane events. Service Health (D) alerts on Azure service issues."
+    },
+    {
+        domain: "Monitoring (10-15%)",
+        question: "You need to query log data to find all failed login attempts in the last 24 hours. Where do you write this query?",
+        options: [
+            "Log Analytics workspace using KQL (Kusto Query Language)",
+            "Azure Monitor Metrics Explorer",
+            "Azure Activity Log",
+            "Application Insights Live Metrics"
+        ],
+        correct: 0,
+        hint: "KQL queries in Log Analytics allow you to search, filter, and analyze log data across resources.",
+        explanation: "Log Analytics workspaces store log data that you query using KQL. Example: `SigninLogs | where TimeGenerated > ago(24h) | where ResultType != 0` finds failed sign-ins. Metrics Explorer (B) shows metric charts, not log queries. Activity Log (C) shows management events. Live Metrics (D) shows real-time app telemetry without historical queries."
+    },
+    {
+        domain: "Monitoring (10-15%)",
+        question: "Which KQL query returns the top 10 VMs by average CPU usage in the last hour?",
+        scenario: "You are working in a Log Analytics workspace with Performance data collected.",
+        options: [
+            "Perf | where TimeGenerated > ago(1h) | where CounterName == '% Processor Time' | summarize avg(CounterValue) by Computer | top 10 by avg_CounterValue desc",
+            "Perf | where CounterName == '% Processor Time' | take 10",
+            "Heartbeat | summarize count() by Computer | top 10",
+            "AzureActivity | where OperationName contains 'CPU' | top 10"
+        ],
+        correct: 0,
+        hint: "You need: filter to last hour, filter to CPU counter, aggregate per computer, sort descending, take top 10.",
+        explanation: "The correct KQL: filter time (ago(1h)), filter counter name (% Processor Time), summarize average per Computer, then top 10 descending. Option B just takes first 10 rows without filtering or aggregating. Option C queries heartbeats (alive status), not CPU. Option D queries management activities, not metrics."
+    },
+    {
+        domain: "Storage (15-20%)",
+        question: "You need to automatically move blobs from Hot to Cool tier after 30 days and to Archive after 90 days. Which feature do you use?",
+        options: [
+            "Lifecycle Management policy",
+            "Azure Logic Apps",
+            "Azure Automation with a schedule",
+            "Manual tier change via portal"
+        ],
+        correct: 0,
+        hint: "Lifecycle Management rules define automated actions (tier changes, deletion) based on blob age.",
+        explanation: "Storage account Lifecycle Management allows rule-based policies: 'Move to Cool after 30 days', 'Move to Archive after 90 days', 'Delete after 365 days'. It's built into the storage account settings — no external automation needed. Logic Apps (B) and Automation (C) could work but are over-engineered for this. Manual (D) doesn't scale."
+    },
+    {
+        domain: "Compute (20-25%)",
+        question: "You need to run a containerized application without managing any VM infrastructure. Which service is the SIMPLEST option?",
+        options: [
+            "Azure Container Instances (ACI)",
+            "Azure Kubernetes Service (AKS)",
+            "Azure App Service with custom container",
+            "Azure Virtual Machine with Docker installed"
+        ],
+        correct: 0,
+        hint: "ACI runs containers without VMs or orchestration — just specify the image and it runs. Simplest serverless container option.",
+        explanation: "Azure Container Instances is the simplest way to run a container in Azure: no VMs, no orchestration, no cluster management. Just specify image, CPU, memory — and it runs. AKS (B) requires managing a cluster. App Service (C) works but has more configuration. VM with Docker (D) means managing the VM yourself. ACI = serverless containers."
+    },
+    {
+        domain: "Identity & Governance (20-25%)",
+        question: "A user needs to temporarily elevate their permissions to manage a resource group for 4 hours. Which feature allows this?",
+        options: [
+            "Privileged Identity Management (PIM) with time-bound activation",
+            "Permanent role assignment with a calendar reminder",
+            "Azure Policy to auto-remove roles",
+            "Conditional Access with session control"
+        ],
+        correct: 0,
+        hint: "PIM allows just-in-time (JIT) role activation — users activate roles only when needed, for a limited duration.",
+        explanation: "Privileged Identity Management enables just-in-time access: users have 'eligible' roles they must activate (with justification, MFA, approval). Activation is time-bound (e.g., 4 hours). After expiry, access is automatically removed. Permanent assignment (B) violates least-privilege. Azure Policy (C) doesn't manage role timing. Conditional Access (D) controls sign-in, not role elevation."
+    },
+    {
+        domain: "Networking (20-25%)",
+        question: "You need to connect your on-premises network to Azure over a private, dedicated connection (not over the internet). What should you use?",
+        options: [
+            "Azure ExpressRoute",
+            "Site-to-Site VPN",
+            "Point-to-Site VPN",
+            "VNet Peering"
+        ],
+        correct: 0,
+        hint: "ExpressRoute provides a PRIVATE connection through a connectivity provider — traffic never goes over the public internet.",
+        explanation: "ExpressRoute establishes a private connection between your on-premises datacenter and Azure through a connectivity provider (like Equinix, AT&T). Traffic doesn't traverse the public internet. Site-to-Site VPN (B) uses encrypted tunnels OVER the internet. Point-to-Site (C) is for individual clients. VNet Peering (D) connects Azure VNets, not on-premises networks."
+    },
+    {
+        domain: "Monitoring (10-15%)",
+        question: "You need to ensure you can restore a VM to its state from 7 days ago. What should you configure?",
+        options: [
+            "Azure Backup with a Recovery Services vault and a 7+ day retention policy",
+            "Azure Site Recovery",
+            "VM snapshots taken manually",
+            "Azure Monitor diagnostic settings"
+        ],
+        correct: 0,
+        hint: "Azure Backup provides scheduled, policy-based backups with configurable retention periods.",
+        explanation: "Azure Backup with a Recovery Services vault provides automated, policy-based VM backups. Configure a backup policy with daily backups and 7+ day retention. You can restore the entire VM or individual files. Site Recovery (B) is for DR replication to another region. Manual snapshots (C) don't provide automated scheduling. Monitor (D) collects metrics/logs, not backups."
+    },
+    {
+        domain: "Compute (20-25%)",
+        question: "An App Service Plan is set to 'Standard S1'. The app is experiencing high latency during peak hours. What's the quickest scaling solution?",
+        options: [
+            "Configure autoscale: scale out (add more instances) based on CPU/request metrics",
+            "Scale up: change from S1 to P3v3",
+            "Move to a new region",
+            "Enable Azure CDN"
+        ],
+        correct: 0,
+        hint: "Scale OUT (horizontal) adds more instances to handle load. Scale UP (vertical) gives bigger machines. Auto-scale reacts to load automatically.",
+        explanation: "Autoscale (scale out) adds more instances based on metrics like CPU or request count during peak times and removes them during off-peak. This is the quickest automated solution. Scale up (B) gives a bigger VM but is manual and may not be enough. Moving regions (C) doesn't help. CDN (D) helps for static content but not app latency."
+    },
+    {
+        domain: "Storage (15-20%)",
+        question: "You need to grant temporary access to a specific blob for a partner without giving them an Azure account. What should you use?",
+        options: [
+            "Shared Access Signature (SAS) with expiry time",
+            "Storage account access key",
+            "Azure AD B2B guest invitation",
+            "Public container access"
+        ],
+        correct: 0,
+        hint: "SAS tokens grant time-limited, permission-scoped access to storage resources without sharing account keys.",
+        explanation: "A SAS token provides delegated access with fine-grained control: specific resource, specific permissions (read only), specific time window. After expiry, access is revoked automatically. Account keys (B) grant full access — dangerous. B2B (C) requires creating an Azure guest account. Public access (D) exposes the blob to everyone — no security."
+    },
+    {
+        domain: "Networking (20-25%)",
+        question: "Traffic from a subnet needs to be forced through a Network Virtual Appliance (NVA) for inspection. How do you configure this?",
+        options: [
+            "Create a Route Table with a custom route pointing to the NVA's private IP as next hop",
+            "Configure NSG rules to redirect traffic",
+            "Enable IP forwarding on the NVA and use VNet peering",
+            "Configure Azure DNS to point to the NVA"
+        ],
+        correct: 0,
+        hint: "User-Defined Routes (UDRs) in Route Tables override Azure's default routing to force traffic through an NVA.",
+        explanation: "Route Tables with User-Defined Routes (UDRs) override Azure's default system routes. Create a route: address prefix = 0.0.0.0/0 (or specific destination), next hop type = 'Virtual appliance', next hop address = NVA's private IP. Associate the route table with the source subnet. Also enable IP forwarding on the NVA's NIC. NSGs (B) filter but don't redirect. DNS (D) resolves names, not routing."
+    },
+    {
+        domain: "Monitoring (10-15%)",
+        question: "You want to visualize the overall health and performance of your Azure resources in a single dashboard. Which tool is best?",
+        options: [
+            "Azure Monitor Workbooks",
+            "Azure Activity Log",
+            "Resource Health",
+            "Azure Advisor"
+        ],
+        correct: 0,
+        hint: "Workbooks provide customizable, interactive reports combining metrics, logs, and visualizations in one view.",
+        explanation: "Azure Monitor Workbooks create rich interactive reports combining metrics, logs, KQL queries, and visualizations in customizable dashboards. Activity Log (B) shows only management events. Resource Health (C) shows per-resource availability status. Azure Advisor (D) provides recommendations, not monitoring dashboards."
+    }
+];
+
+let currentIndex = 0;
+let correctCount = 0;
+let answered = new Array(questions.length).fill(false);
+let timerInterval;
+let timeElapsed = 0;
+
+function init() {
+    const container = document.getElementById('questions-container');
+    questions.forEach((q, i) => {
+        const card = document.createElement('div');
+        card.className = 'question-card' + (i === 0 ? ' active' : '');
+        card.id = 'q-' + i;
+        card.innerHTML = `
+            <div class="domain">${q.domain}</div>
+            <div class="q-number">Question ${i + 1} of ${questions.length}</div>
+            <h3>${q.question}</h3>
+            ${q.scenario ? `<div class="scenario">${q.scenario}</div>` : ''}
+            <ul class="options">
+                ${q.options.map((opt, j) => `
+                    <li onclick="selectOption(${i}, ${j})" id="opt-${i}-${j}">
+                        <span class="letter">${String.fromCharCode(65 + j)}</span>
+                        <span>${opt}</span>
+                    </li>
+                `).join('')}
+            </ul>
+            <div class="hint-box" id="hint-${i}">💡 <strong>Hint:</strong> ${q.hint}</div>
+            <div class="explanation-box" id="exp-${i}">
+                <h4>✅ Explanation</h4>
+                <p>${q.explanation}</p>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-hint" onclick="showHint(${i})">Show Hint</button>
+                <button class="btn btn-check" id="check-${i}" onclick="checkAnswer(${i})">Check Answer</button>
+                ${i < questions.length - 1 ? `<button class="btn btn-next" id="next-${i}" onclick="nextQuestion(${i})" style="display:none">Next →</button>` : `<button class="btn btn-next" id="next-${i}" onclick="showResults()" style="display:none">Finish Exam</button>`}
+            </div>
+        `;
+        container.appendChild(card);
+    });
+    startTimer();
+}
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeElapsed++;
+        const h = Math.floor(timeElapsed / 3600);
+        const m = Math.floor((timeElapsed % 3600) / 60);
+        const s = timeElapsed % 60;
+        document.getElementById('timer').textContent =
+            `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        if (timeElapsed >= 7200) { showResults(); }
+    }, 1000);
+}
+
+function selectOption(qIndex, optIndex) {
+    if (answered[qIndex]) return;
+    document.querySelectorAll(`#q-${qIndex} .options li`).forEach(li => li.classList.remove('selected'));
+    document.getElementById(`opt-${qIndex}-${optIndex}`).classList.add('selected');
+}
+
+function showHint(qIndex) {
+    document.getElementById(`hint-${qIndex}`).classList.add('show');
+}
+
+function checkAnswer(qIndex) {
+    if (answered[qIndex]) return;
+    const selected = document.querySelector(`#q-${qIndex} .options li.selected`);
+    if (!selected) return;
+
+    answered[qIndex] = true;
+    const selectedIndex = parseInt(selected.id.split('-')[2]);
+    const correct = questions[qIndex].correct;
+
+    if (selectedIndex === correct) {
+        selected.classList.add('correct');
+        correctCount++;
+    } else {
+        selected.classList.add('incorrect');
+        document.getElementById(`opt-${qIndex}-${correct}`).classList.add('correct');
+    }
+
+    document.getElementById(`exp-${qIndex}`).classList.add('show');
+    document.getElementById(`check-${qIndex}`).style.display = 'none';
+    document.getElementById(`next-${qIndex}`).style.display = 'inline-block';
+    document.getElementById('correct-count').textContent = correctCount;
+}
+
+function nextQuestion(qIndex) {
+    document.getElementById(`q-${qIndex}`).classList.remove('active');
+    currentIndex = qIndex + 1;
+    document.getElementById(`q-${currentIndex}`).classList.add('active');
+    document.getElementById('current-q').textContent = currentIndex + 1;
+    document.getElementById('progress-fill').style.width = ((currentIndex + 1) / questions.length * 100) + '%';
+}
+
+function showResults() {
+    clearInterval(timerInterval);
+    document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+    document.querySelector('.progress-bar').style.display = 'none';
+    const results = document.getElementById('results');
+    results.style.display = 'block';
+
+    const pct = Math.round((correctCount / questions.length) * 100);
+    const score = Math.round(pct * 10); // Scale to 1000
+    document.getElementById('final-score').textContent = score + '/1000';
+    document.getElementById('final-score').className = 'score ' + (score >= 700 ? 'pass' : 'fail');
+    document.getElementById('pass-fail-msg').textContent = score >= 700 ? '🎉 PASSED! You scored above the 700/1000 threshold.' : '❌ Not yet. You need 700/1000 to pass. Keep studying!';
+    document.getElementById('r-correct').textContent = correctCount;
+    document.getElementById('r-incorrect').textContent = questions.length - correctCount;
+    const m = Math.floor(timeElapsed / 60);
+    document.getElementById('r-time').textContent = m + ' min';
+}
+
+function resetExam() {
+    currentIndex = 0;
+    correctCount = 0;
+    answered = new Array(questions.length).fill(false);
+    timeElapsed = 0;
+    document.getElementById('results').style.display = 'none';
+    document.querySelector('.progress-bar').style.display = 'flex';
+    document.getElementById('questions-container').innerHTML = '';
+    init();
+}
+
+init();
+</script>
+</body>
+</html>

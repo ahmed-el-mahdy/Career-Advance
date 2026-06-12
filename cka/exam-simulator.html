@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CKA Exam Simulator — Practice Questions</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0f1a;
+            --card: #1a1a2e;
+            --border: #2a2a40;
+            --text: #e0e0f0;
+            --muted: #8888aa;
+            --blue: #326CE5;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --purple: #a855f7;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        .header {
+            background: linear-gradient(135deg, #326CE5 0%, #1a1a2e 100%);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .header h1 { font-size: 2em; margin-bottom: 8px; }
+        .header p { color: var(--muted); font-size: 14px; }
+        .header .badge {
+            display: inline-block;
+            background: rgba(50,108,229,0.3);
+            border: 1px solid var(--blue);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 12px;
+            color: var(--blue);
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+
+        .progress-bar {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .progress-info { display: flex; gap: 24px; }
+        .progress-stat { text-align: center; }
+        .progress-stat .num { font-size: 1.5em; font-weight: 700; }
+        .progress-stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+        .progress-fill-wrap { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 12px; }
+        .progress-fill { height: 100%; background: var(--blue); border-radius: 3px; transition: width 0.3s; }
+
+        .timer { font-family: 'JetBrains Mono', monospace; font-size: 1.3em; color: var(--orange); }
+
+        .question-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        .question-card.active { display: block; }
+        .question-card .domain {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .question-card .q-number { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+        .question-card h3 { font-size: 18px; margin-bottom: 20px; line-height: 1.5; }
+        .question-card .scenario {
+            background: #0a0a14;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .options { list-style: none; }
+        .options li {
+            padding: 14px 20px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .options li:hover { border-color: var(--blue); background: rgba(50,108,229,0.05); }
+        .options li.selected { border-color: var(--blue); background: rgba(50,108,229,0.1); }
+        .options li.correct { border-color: var(--green); background: rgba(16,185,129,0.1); }
+        .options li.incorrect { border-color: var(--red); background: rgba(239,68,68,0.1); }
+        .options li .letter {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .hint-box {
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+            font-size: 14px;
+            color: var(--orange);
+        }
+        .hint-box.show { display: block; }
+
+        .explanation-box {
+            background: rgba(16,185,129,0.08);
+            border: 1px solid rgba(16,185,129,0.3);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+            font-size: 14px;
+        }
+        .explanation-box.show { display: block; }
+        .explanation-box h4 { color: var(--green); margin-bottom: 8px; }
+        .explanation-box code { background: #0a0a14; padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+        .btn-row { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-hint { background: rgba(245,158,11,0.15); color: var(--orange); border: 1px solid rgba(245,158,11,0.3); }
+        .btn-hint:hover { background: rgba(245,158,11,0.25); }
+        .btn-check { background: var(--blue); color: white; }
+        .btn-check:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-next { background: var(--green); color: white; }
+        .btn-next:hover { opacity: 0.9; }
+        .btn-reset { background: var(--border); color: var(--text); }
+        .btn-reset:hover { background: #3a3a50; }
+
+        .results {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            display: none;
+        }
+        .results h2 { font-size: 2em; margin-bottom: 16px; }
+        .results .score { font-size: 4em; font-weight: 800; margin: 20px 0; }
+        .results .score.pass { color: var(--green); }
+        .results .score.fail { color: var(--red); }
+        .results .breakdown { display: flex; gap: 24px; justify-content: center; margin-top: 24px; }
+        .results .breakdown .item { text-align: center; }
+        .results .breakdown .item .num { font-size: 1.5em; font-weight: 700; }
+        .results .breakdown .item .label { font-size: 12px; color: var(--muted); }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.5em; }
+            .progress-info { gap: 16px; }
+            .question-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>☸️ CKA Exam Simulator</h1>
+    <p>Certified Kubernetes Administrator — Practice Questions</p>
+    <div class="badge">25 Questions • 120 Minutes • 66% to Pass</div>
+</div>
+
+<div class="container">
+    <div class="progress-bar">
+        <div class="progress-info">
+            <div class="progress-stat">
+                <div class="num" id="current-q">1</div>
+                <div class="label">Question</div>
+            </div>
+            <div class="progress-stat">
+                <div class="num" id="total-q">25</div>
+                <div class="label">Total</div>
+            </div>
+            <div class="progress-stat">
+                <div class="num" id="correct-count">0</div>
+                <div class="label">Correct</div>
+            </div>
+        </div>
+        <div class="timer" id="timer">02:00:00</div>
+        <div class="progress-fill-wrap">
+            <div class="progress-fill" id="progress-fill" style="width: 4%"></div>
+        </div>
+    </div>
+
+    <div id="questions-container"></div>
+
+    <div class="results" id="results">
+        <h2>Exam Complete!</h2>
+        <div class="score" id="final-score"></div>
+        <p id="pass-fail-msg"></p>
+        <div class="breakdown">
+            <div class="item"><div class="num" id="r-correct">0</div><div class="label">Correct</div></div>
+            <div class="item"><div class="num" id="r-incorrect">0</div><div class="label">Incorrect</div></div>
+            <div class="item"><div class="num" id="r-time">0</div><div class="label">Time Used</div></div>
+        </div>
+        <div class="btn-row" style="justify-content: center; margin-top: 30px;">
+            <button class="btn btn-reset" onclick="resetExam()">Retake Exam</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {
+        domain: "Cluster Architecture (25%)",
+        question: "You need to create a ClusterRole that allows a user to list and get nodes. Which command achieves this?",
+        scenario: "Context: cluster1\nYou are tasked with setting up RBAC for a monitoring user who needs read-only access to nodes.",
+        options: [
+            "kubectl create clusterrole node-reader --verb=get,list --resource=nodes",
+            "kubectl create role node-reader --verb=get,list --resource=nodes",
+            "kubectl create clusterrole node-reader --verb=* --resource=nodes",
+            "kubectl create clusterrolebinding node-reader --verb=get,list --resource=nodes"
+        ],
+        correct: 0,
+        hint: "ClusterRole (not Role) is needed for cluster-scoped resources like nodes. Also think about least-privilege.",
+        explanation: "Nodes are cluster-scoped resources, so you need a ClusterRole (not a namespace-scoped Role). The command `kubectl create clusterrole node-reader --verb=get,list --resource=nodes` creates a role with only get and list permissions, following least-privilege. Option C grants all verbs (*) which is too permissive. Option D confuses ClusterRoleBinding with ClusterRole."
+    },
+    {
+        domain: "Cluster Architecture (25%)",
+        question: "You need to backup etcd. Which command performs an etcd snapshot save?",
+        scenario: "Context: cluster1\nThe etcd server is running with:\n  --cert-file=/etc/kubernetes/pki/etcd/server.crt\n  --key-file=/etc/kubernetes/pki/etcd/server.key\n  --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt\n  --listen-client-urls=https://127.0.0.1:2379",
+        options: [
+            "ETCDCTL_API=3 etcdctl snapshot save /tmp/backup.db --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key",
+            "etcdctl backup --data-dir=/var/lib/etcd --backup-dir=/tmp/backup",
+            "ETCDCTL_API=2 etcdctl snapshot save /tmp/backup.db",
+            "kubectl exec etcd-master -- etcdctl snapshot save /tmp/backup.db"
+        ],
+        correct: 0,
+        hint: "etcd v3 API requires ETCDCTL_API=3. You must provide TLS certificates matching the server configuration.",
+        explanation: "The correct command uses ETCDCTL_API=3 (v3 is required for snapshot commands), provides the endpoint URL matching listen-client-urls, and includes all three TLS certificate flags (--cacert, --cert, --key) matching the server's PKI configuration. Option B uses the old v2 backup method. Option C uses wrong API version. Option D won't have access to the certificates."
+    },
+    {
+        domain: "Cluster Architecture (25%)",
+        question: "A worker node shows NotReady status. After SSH-ing to the node, what should you check FIRST?",
+        scenario: "$ kubectl get nodes\nNAME      STATUS     ROLES    AGE   VERSION\nmaster    Ready      master   30d   v1.29.0\nworker1   NotReady   <none>   30d   v1.29.0",
+        options: [
+            "Check kubelet status: systemctl status kubelet",
+            "Check pod status: kubectl get pods --all-namespaces",
+            "Restart the entire node",
+            "Delete the node: kubectl delete node worker1"
+        ],
+        correct: 0,
+        hint: "NotReady usually means the kubelet isn't reporting. Check the kubelet service on the node itself.",
+        explanation: "When a node shows NotReady, the kubelet service on that node is likely not running or failing. The first diagnostic step after SSH-ing is `systemctl status kubelet` and then checking logs with `journalctl -u kubelet`. Common causes: stopped service, expired certificates, wrong config. Never delete a node or restart without diagnosis first."
+    },
+    {
+        domain: "Cluster Architecture (25%)",
+        question: "You need to upgrade a cluster from v1.28 to v1.29. What is the correct order of operations for the control plane?",
+        options: [
+            "Upgrade kubeadm → kubeadm upgrade apply → Upgrade kubelet & kubectl → Restart kubelet",
+            "Upgrade kubelet → Upgrade kubeadm → kubeadm upgrade apply → Restart kubelet",
+            "kubeadm upgrade apply → Upgrade kubeadm → Upgrade kubelet → Restart",
+            "Drain node → Upgrade kubectl → kubeadm upgrade apply → Uncordon"
+        ],
+        correct: 0,
+        hint: "kubeadm must be upgraded BEFORE running 'kubeadm upgrade apply'. kubelet comes AFTER the control plane upgrade.",
+        explanation: "The correct upgrade order: 1) apt install kubeadm=1.29.x (upgrade the tool first), 2) kubeadm upgrade plan (verify), 3) kubeadm upgrade apply v1.29.x (upgrade control plane components), 4) apt install kubelet=1.29.x kubectl=1.29.x, 5) systemctl daemon-reload && systemctl restart kubelet. You can't run 'kubeadm upgrade apply' with an old version of kubeadm."
+    },
+    {
+        domain: "Workloads & Scheduling (15%)",
+        question: "Create a deployment named 'web' with 3 replicas using nginx:1.25 in namespace 'production'. Which command is correct?",
+        options: [
+            "kubectl create deployment web --image=nginx:1.25 --replicas=3 -n production",
+            "kubectl run web --image=nginx:1.25 --replicas=3 -n production",
+            "kubectl create deployment web --image=nginx:1.25 -n production && kubectl scale deployment web --replicas=3 -n production",
+            "kubectl apply -f deployment.yaml"
+        ],
+        correct: 0,
+        hint: "'kubectl create deployment' supports --replicas flag directly. 'kubectl run' creates pods, not deployments.",
+        explanation: "The `kubectl create deployment` command supports --image and --replicas flags directly, making it the fastest single command. Option B: 'kubectl run' creates a Pod, not a Deployment. Option C works but uses two commands unnecessarily. Option D requires a YAML file that doesn't exist yet."
+    },
+    {
+        domain: "Workloads & Scheduling (15%)",
+        question: "A pod must run on a node with label 'disk=ssd'. Which field in the pod spec enforces this?",
+        options: [
+            "spec.nodeSelector with {disk: ssd}",
+            "spec.tolerations with {key: disk, value: ssd}",
+            "spec.nodeName with the specific node name",
+            "spec.affinity.podAffinity"
+        ],
+        correct: 0,
+        hint: "nodeSelector is the simplest way to constrain pods to specific nodes by label. Tolerations are for taints, not labels.",
+        explanation: "nodeSelector is the simplest pod scheduling constraint. Adding `nodeSelector: {disk: ssd}` to pod spec means the pod will only schedule on nodes with that label. Tolerations (B) are for allowing pods on tainted nodes. nodeName (C) hard-codes a specific node. podAffinity (D) is about co-locating with other pods, not node labels."
+    },
+    {
+        domain: "Workloads & Scheduling (15%)",
+        question: "You need to create a CronJob that runs 'echo backup-done' every day at 3 AM. What is the correct cron schedule?",
+        options: [
+            "0 3 * * *",
+            "3 0 * * *",
+            "* * 3 * *",
+            "0 0 3 * *"
+        ],
+        correct: 0,
+        hint: "Cron format: minute hour day-of-month month day-of-week. '3 AM' means hour=3, minute=0.",
+        explanation: "Cron format is: minute(0-59) hour(0-23) day(1-31) month(1-12) weekday(0-7). For 'every day at 3:00 AM': minute=0, hour=3, rest=* (any). So `0 3 * * *`. Option B (3 0) = 12:03 AM. Option C (* * 3) = every minute on the 3rd day. Option D (0 0 3) = midnight on the 3rd day."
+    },
+    {
+        domain: "Services & Networking (20%)",
+        question: "You need to create a NetworkPolicy that denies ALL ingress traffic to pods with label 'app=db' in namespace 'production'. Which spec achieves this?",
+        scenario: "apiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: deny-db-ingress\n  namespace: production\nspec:\n  podSelector:\n    matchLabels:\n      app: db\n  policyTypes:\n  - Ingress",
+        options: [
+            "The spec shown above (empty ingress rules = deny all ingress)",
+            "Add 'ingress: []' to explicitly deny",
+            "Add 'ingress: [{from: []}]' to deny all",
+            "You cannot deny all traffic with NetworkPolicy"
+        ],
+        correct: 0,
+        hint: "A NetworkPolicy with policyTypes: [Ingress] but NO ingress rules blocks all ingress by default.",
+        explanation: "When you specify `policyTypes: [Ingress]` but don't include any `ingress` rules in the spec, it means: 'I'm managing ingress for these pods, and I allow nothing.' This effectively denies all inbound traffic. Adding `ingress: []` (option B) is equivalent but redundant. Option C with `from: []` actually allows all traffic (empty from = allow any source)."
+    },
+    {
+        domain: "Services & Networking (20%)",
+        question: "A Service named 'my-svc' in namespace 'app' has no endpoints. What is the most likely cause?",
+        options: [
+            "The Service selector labels don't match any pod labels",
+            "The Service port is wrong",
+            "The namespace doesn't exist",
+            "NetworkPolicy is blocking traffic"
+        ],
+        correct: 0,
+        hint: "Endpoints are populated when the Service selector matches pod labels. No match = no endpoints.",
+        explanation: "A Service discovers pods via label selectors. If `kubectl get endpoints my-svc -n app` shows no endpoints, it means no pods match the Service's selector. Fix: compare `kubectl describe svc my-svc -n app` selector with `kubectl get pods -n app --show-labels`. Wrong port (B) would still show endpoints but traffic wouldn't work. NetworkPolicy (D) doesn't affect endpoint discovery."
+    },
+    {
+        domain: "Services & Networking (20%)",
+        question: "What is the FQDN to reach a Service named 'api-svc' in namespace 'backend' from a pod in namespace 'frontend'?",
+        options: [
+            "api-svc.backend.svc.cluster.local",
+            "api-svc.frontend.svc.cluster.local",
+            "api-svc.svc.cluster.local",
+            "backend.api-svc.cluster.local"
+        ],
+        correct: 0,
+        hint: "DNS format: <service-name>.<namespace>.svc.cluster.local",
+        explanation: "Kubernetes DNS follows the pattern: `<service>.<namespace>.svc.cluster.local`. Since the service is in 'backend' namespace, its FQDN is `api-svc.backend.svc.cluster.local`. Within the same namespace you can use just 'api-svc', but cross-namespace requires at least `api-svc.backend`."
+    },
+    {
+        domain: "Services & Networking (20%)",
+        question: "You need to expose a deployment on port 30080 externally. Which Service type and command should you use?",
+        options: [
+            "kubectl expose deployment web --type=NodePort --port=80 --target-port=8080 (then set nodePort: 30080 in YAML)",
+            "kubectl expose deployment web --type=ClusterIP --port=30080",
+            "kubectl expose deployment web --type=LoadBalancer --port=30080",
+            "kubectl expose deployment web --type=ExternalName --port=30080"
+        ],
+        correct: 0,
+        hint: "NodePort exposes on a specific port (30000-32767) on every node. You can't set nodePort via kubectl expose directly.",
+        explanation: "NodePort services expose on every node's IP at a port in range 30000-32767. `kubectl expose` doesn't have a --node-port flag, so you generate YAML with --dry-run=client -o yaml, edit to add `nodePort: 30080`, then apply. ClusterIP (B) is internal only. LoadBalancer (C) uses cloud provider's LB. ExternalName (D) maps to a DNS name."
+    },
+    {
+        domain: "Storage (10%)",
+        question: "A PVC is stuck in 'Pending' state. Which of the following is NOT a possible cause?",
+        options: [
+            "The pod using the PVC has a wrong volumeMount path",
+            "No PV matches the PVC's requested storage size",
+            "No PV matches the PVC's accessModes",
+            "No StorageClass exists and no default StorageClass is set"
+        ],
+        correct: 0,
+        hint: "PVC binding happens BEFORE a pod mounts it. Think about what affects PVC→PV binding vs pod→PVC mounting.",
+        explanation: "A PVC binds to a PV independently of any pod. The volumeMount path in a pod spec has nothing to do with PVC binding — it only matters when the pod tries to mount. PVC stays Pending when: no PV has enough capacity (B), accessModes don't match (C), or no StorageClass can dynamically provision (D). The volumeMount path (A) would cause a pod error, not a PVC Pending state."
+    },
+    {
+        domain: "Storage (10%)",
+        question: "You need a PersistentVolume with 5Gi storage, ReadWriteOnce access, and hostPath at /data/vol1. Which spec is correct?",
+        scenario: "apiVersion: v1\nkind: PersistentVolume\nmetadata:\n  name: pv-vol1\nspec:\n  capacity:\n    storage: ???\n  accessModes:\n    - ???\n  hostPath:\n    path: ???",
+        options: [
+            "storage: 5Gi, accessModes: [ReadWriteOnce], path: /data/vol1",
+            "storage: 5GB, accessModes: [ReadWrite], path: /data/vol1",
+            "storage: 5Gi, accessModes: [ReadWriteMany], path: /data/vol1",
+            "storage: 5000Mi, accessModes: [ROX], path: /data/vol1"
+        ],
+        correct: 0,
+        hint: "Kubernetes uses 'Gi' (not GB). Valid access modes: ReadWriteOnce (RWO), ReadOnlyMany (ROX), ReadWriteMany (RWX).",
+        explanation: "Correct: storage uses binary units (Gi, Mi), access mode is 'ReadWriteOnce' (full word), and hostPath is the specified directory. Option B: 'GB' and 'ReadWrite' are invalid. Option C: ReadWriteMany doesn't match the requirement. Option D: 'ROX' is shorthand notation not valid in YAML specs (must spell out ReadOnlyMany)."
+    },
+    {
+        domain: "Troubleshooting (30%)",
+        question: "A pod is in CrashLoopBackOff. What is the FIRST command to diagnose the issue?",
+        options: [
+            "kubectl logs <pod-name> --previous",
+            "kubectl describe pod <pod-name>",
+            "kubectl delete pod <pod-name>",
+            "kubectl exec -it <pod-name> -- /bin/bash"
+        ],
+        correct: 0,
+        hint: "CrashLoopBackOff means the container keeps crashing. You need to see why it crashed — check the PREVIOUS container's logs.",
+        explanation: "When a pod is in CrashLoopBackOff, the container starts and immediately crashes. Use `kubectl logs <pod> --previous` to see the logs from the last crashed container. This reveals the error (missing config, wrong command, permission denied, etc.). `kubectl describe` (B) shows events but not app-level errors. You can't exec (D) into a crashed container. Deleting (C) just recreates the same problem."
+    },
+    {
+        domain: "Troubleshooting (30%)",
+        question: "A deployment shows 0/3 replicas ready. kubectl describe shows: 'Failed to pull image \"ngnix:latest\": image not found'. What's the fix?",
+        options: [
+            "kubectl set image deployment/web web=nginx:latest",
+            "kubectl rollout restart deployment/web",
+            "kubectl delete deployment web && kubectl create deployment web --image=nginx",
+            "kubectl scale deployment web --replicas=0 && kubectl scale deployment web --replicas=3"
+        ],
+        correct: 0,
+        hint: "The image name has a typo: 'ngnix' instead of 'nginx'. Fix the image name.",
+        explanation: "The error shows 'ngnix' (typo) instead of 'nginx'. The fastest fix is `kubectl set image deployment/web web=nginx:latest` which corrects the image name and triggers a new rollout. Rollout restart (B) would restart with the SAME broken image. Delete/recreate (C) is destructive. Scaling (D) doesn't fix the image name."
+    },
+    {
+        domain: "Troubleshooting (30%)",
+        question: "A pod is stuck in Pending state. kubectl describe shows: 'Insufficient cpu'. What should you do?",
+        options: [
+            "Reduce the pod's resource requests or add more nodes to the cluster",
+            "Delete the pod and recreate it",
+            "Restart the scheduler",
+            "Remove all resource limits from the pod"
+        ],
+        correct: 0,
+        hint: "'Insufficient cpu' means no node has enough allocatable CPU to satisfy the pod's resource requests.",
+        explanation: "The scheduler can't find a node with enough CPU for the pod's resource requests. Solutions: 1) Reduce the pod's `resources.requests.cpu` to a value nodes can accommodate, OR 2) Add more nodes / scale existing ones. Deleting (B) recreates the same problem. Restarting scheduler (C) doesn't free resources. Removing limits (D) without removing requests doesn't help, and removing all resource constraints is bad practice."
+    },
+    {
+        domain: "Troubleshooting (30%)",
+        question: "CoreDNS pods are in CrashLoopBackOff. Pods cannot resolve service names. What is a common cause?",
+        options: [
+            "CoreDNS has a loop detection issue — the host's /etc/resolv.conf points to 127.0.0.1",
+            "The cluster doesn't have enough memory",
+            "NetworkPolicy is blocking DNS traffic",
+            "The kube-proxy service is not running"
+        ],
+        correct: 0,
+        hint: "CoreDNS crashes when it detects a forwarding loop — commonly caused by systemd-resolved on the host pointing to localhost.",
+        explanation: "A very common CoreDNS crash: the node's /etc/resolv.conf has `nameserver 127.0.0.1` (systemd-resolved). CoreDNS forwards to this, which forwards back to CoreDNS, creating a loop. CoreDNS detects this and crashes. Fix: edit CoreDNS ConfigMap to forward to a real upstream DNS (e.g., 8.8.8.8) or fix the host's resolv.conf."
+    },
+    {
+        domain: "Troubleshooting (30%)",
+        question: "After upgrading a worker node, it shows 'NotReady' and kubelet logs show 'certificate has expired'. What's the fix?",
+        options: [
+            "Renew kubelet certificates: kubeadm certs renew all (on control plane) or re-join the node",
+            "Restart the kube-apiserver",
+            "Delete the node and re-create it",
+            "Upgrade kubeadm to a newer version"
+        ],
+        correct: 0,
+        hint: "Expired certificates prevent kubelet from communicating with the API server. Certificates can be renewed or the node can be re-joined.",
+        explanation: "Expired kubelet certificates prevent the node from reporting to the API server (NotReady). Fix options: 1) On control plane: `kubeadm certs renew all`, 2) On the worker: delete kubelet certs and restart (kubelet auto-requests new ones if bootstrap token is valid), 3) `kubeadm token create` + re-join the node. Restarting apiserver (B) doesn't fix worker certs."
+    },
+    {
+        domain: "Cluster Architecture (25%)",
+        question: "Which component is responsible for assigning pods to nodes?",
+        options: [
+            "kube-scheduler",
+            "kube-controller-manager",
+            "kubelet",
+            "kube-proxy"
+        ],
+        correct: 0,
+        hint: "The scheduler watches for newly created pods with no assigned node and selects a node for them to run on.",
+        explanation: "kube-scheduler watches for new pods without a nodeName and assigns them to a suitable node based on resource requirements, affinity/anti-affinity, taints/tolerations, and other constraints. kube-controller-manager (B) manages controllers (ReplicaSet, Node, etc.). kubelet (C) runs pods on the node AFTER scheduling. kube-proxy (D) manages network rules for Services."
+    },
+    {
+        domain: "Workloads & Scheduling (15%)",
+        question: "You need to ensure a pod runs on EVERY node in the cluster (including future nodes). Which resource type should you use?",
+        options: [
+            "DaemonSet",
+            "Deployment with replicas equal to node count",
+            "StatefulSet",
+            "ReplicaSet with node affinity"
+        ],
+        correct: 0,
+        hint: "DaemonSets automatically ensure one pod copy runs on every (or selected) node.",
+        explanation: "DaemonSet ensures that all (or some) nodes run a copy of a pod. When nodes are added, DaemonSet pods are automatically added. Common uses: log collectors (fluentd), monitoring agents (node-exporter), storage daemons. A Deployment (B) doesn't guarantee one-per-node and won't auto-adjust when nodes are added/removed."
+    },
+    {
+        domain: "Services & Networking (20%)",
+        question: "You created an Ingress resource but it's not routing traffic. What should you check FIRST?",
+        options: [
+            "Verify an Ingress Controller (like nginx-ingress) is deployed in the cluster",
+            "Check if the pods have enough CPU",
+            "Verify the pod's readiness probe",
+            "Check if a NetworkPolicy is blocking port 443"
+        ],
+        correct: 0,
+        hint: "An Ingress resource does NOTHING without an Ingress Controller to implement it.",
+        explanation: "Ingress resources are just configuration — they require an Ingress Controller (like nginx-ingress-controller, traefik, etc.) to actually process and route traffic. Without a controller, the Ingress resource has no effect. Check: `kubectl get pods -n ingress-nginx` or similar namespace to verify the controller exists and is running."
+    },
+    {
+        domain: "Storage (10%)",
+        question: "What happens to a PersistentVolume with 'Retain' reclaim policy when its PVC is deleted?",
+        options: [
+            "The PV is released but data is preserved — manual cleanup required before reuse",
+            "The PV and its data are automatically deleted",
+            "The PV becomes Available and can be bound to a new PVC immediately",
+            "The PV enters a Failed state"
+        ],
+        correct: 0,
+        hint: "Retain means: keep the data safe even after PVC deletion. The admin must manually clean up.",
+        explanation: "With 'Retain' policy: when the PVC is deleted, the PV moves to 'Released' state. The data on the volume is preserved but the PV cannot be bound to a new PVC until an admin manually reclaims it (clean data, delete PV, or recreate). 'Delete' policy (B) would auto-delete. 'Recycle' (deprecated) would scrub data and make Available (C)."
+    },
+    {
+        domain: "Troubleshooting (30%)",
+        question: "A pod's readiness probe is failing. What is the effect on the Service that selects this pod?",
+        options: [
+            "The pod's IP is removed from the Service's endpoints — no traffic is sent to it",
+            "The pod is terminated and restarted",
+            "The Service is deleted",
+            "Nothing — readiness probes don't affect Services"
+        ],
+        correct: 0,
+        hint: "Readiness probes determine if a pod should RECEIVE traffic. Liveness probes determine if it should be RESTARTED.",
+        explanation: "When a readiness probe fails, the pod's IP is removed from the Service's endpoints. Traffic stops being routed to that pod, but the pod is NOT restarted (that's what liveness probes do). Once the readiness probe passes again, the pod is re-added to endpoints. This is useful for slow-starting apps or temporary unavailability."
+    },
+    {
+        domain: "Cluster Architecture (25%)",
+        question: "You need to create a ServiceAccount named 'deploy-sa' in namespace 'cicd' and bind it to the 'edit' ClusterRole within that namespace only. Which commands are correct?",
+        options: [
+            "kubectl create sa deploy-sa -n cicd && kubectl create rolebinding deploy-edit --clusterrole=edit --serviceaccount=cicd:deploy-sa -n cicd",
+            "kubectl create sa deploy-sa -n cicd && kubectl create clusterrolebinding deploy-edit --clusterrole=edit --serviceaccount=cicd:deploy-sa",
+            "kubectl create sa deploy-sa && kubectl create rolebinding deploy-edit --role=edit --serviceaccount=default:deploy-sa",
+            "kubectl create sa deploy-sa -n cicd && kubectl create role edit -n cicd --verb=* --resource=*"
+        ],
+        correct: 0,
+        hint: "A RoleBinding can reference a ClusterRole but scopes it to a specific namespace. ClusterRoleBinding grants cluster-wide access.",
+        explanation: "Key insight: A RoleBinding + ClusterRole = ClusterRole permissions scoped to ONE namespace. This is the correct pattern when you want namespace-limited access using a pre-existing ClusterRole like 'edit'. Option B uses ClusterRoleBinding which gives edit access cluster-wide (too broad). Option C has wrong namespace and uses --role instead of --clusterrole. Option D tries to recreate the role."
+    },
+    {
+        domain: "Troubleshooting (30%)",
+        question: "A node has the taint 'node-role.kubernetes.io/control-plane:NoSchedule'. A pod you deployed is stuck Pending. How do you allow it to run on this node?",
+        options: [
+            "Add a toleration to the pod spec: key=node-role.kubernetes.io/control-plane, effect=NoSchedule",
+            "Remove the taint from the node: kubectl taint nodes master node-role.kubernetes.io/control-plane:NoSchedule-",
+            "Both A and B would work — A changes the pod, B changes the node",
+            "Change the pod's nodeSelector to target the control plane node"
+        ],
+        correct: 2,
+        hint: "There are two approaches: make the pod tolerate the taint, or remove the taint from the node. Both are valid.",
+        explanation: "Both approaches work: A) Adding a toleration to the pod allows it to be scheduled on tainted nodes without changing the node. B) Removing the taint from the node allows ALL pods to schedule there. In the exam, choose based on what's asked — if they say 'don't modify the node', use tolerations. If they say 'allow all pods on this node', remove the taint. nodeSelector (D) only handles labels, not taints."
+    }
+];
+
+let currentIndex = 0;
+let correctCount = 0;
+let answered = new Array(questions.length).fill(false);
+let timerInterval;
+let timeElapsed = 0;
+
+function init() {
+    const container = document.getElementById('questions-container');
+    questions.forEach((q, i) => {
+        const card = document.createElement('div');
+        card.className = 'question-card' + (i === 0 ? ' active' : '');
+        card.id = 'q-' + i;
+        card.innerHTML = `
+            <div class="domain">${q.domain}</div>
+            <div class="q-number">Question ${i + 1} of ${questions.length}</div>
+            <h3>${q.question}</h3>
+            ${q.scenario ? `<div class="scenario">${q.scenario}</div>` : ''}
+            <ul class="options">
+                ${q.options.map((opt, j) => `
+                    <li onclick="selectOption(${i}, ${j})" id="opt-${i}-${j}">
+                        <span class="letter">${String.fromCharCode(65 + j)}</span>
+                        <span>${opt}</span>
+                    </li>
+                `).join('')}
+            </ul>
+            <div class="hint-box" id="hint-${i}">💡 <strong>Hint:</strong> ${q.hint}</div>
+            <div class="explanation-box" id="exp-${i}">
+                <h4>✅ Explanation</h4>
+                <p>${q.explanation}</p>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-hint" onclick="showHint(${i})">Show Hint</button>
+                <button class="btn btn-check" id="check-${i}" onclick="checkAnswer(${i})">Check Answer</button>
+                ${i < questions.length - 1 ? `<button class="btn btn-next" id="next-${i}" onclick="nextQuestion(${i})" style="display:none">Next →</button>` : `<button class="btn btn-next" id="next-${i}" onclick="showResults()" style="display:none">Finish Exam</button>`}
+            </div>
+        `;
+        container.appendChild(card);
+    });
+    startTimer();
+}
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeElapsed++;
+        const h = Math.floor(timeElapsed / 3600);
+        const m = Math.floor((timeElapsed % 3600) / 60);
+        const s = timeElapsed % 60;
+        document.getElementById('timer').textContent =
+            `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        if (timeElapsed >= 7200) { showResults(); }
+    }, 1000);
+}
+
+function selectOption(qIndex, optIndex) {
+    if (answered[qIndex]) return;
+    document.querySelectorAll(`#q-${qIndex} .options li`).forEach(li => li.classList.remove('selected'));
+    document.getElementById(`opt-${qIndex}-${optIndex}`).classList.add('selected');
+}
+
+function showHint(qIndex) {
+    document.getElementById(`hint-${qIndex}`).classList.add('show');
+}
+
+function checkAnswer(qIndex) {
+    if (answered[qIndex]) return;
+    const selected = document.querySelector(`#q-${qIndex} .options li.selected`);
+    if (!selected) return;
+
+    answered[qIndex] = true;
+    const selectedIndex = parseInt(selected.id.split('-')[2]);
+    const correct = questions[qIndex].correct;
+
+    if (selectedIndex === correct) {
+        selected.classList.add('correct');
+        correctCount++;
+    } else {
+        selected.classList.add('incorrect');
+        document.getElementById(`opt-${qIndex}-${correct}`).classList.add('correct');
+    }
+
+    document.getElementById(`exp-${qIndex}`).classList.add('show');
+    document.getElementById(`check-${qIndex}`).style.display = 'none';
+    document.getElementById(`next-${qIndex}`).style.display = 'inline-block';
+    document.getElementById('correct-count').textContent = correctCount;
+}
+
+function nextQuestion(qIndex) {
+    document.getElementById(`q-${qIndex}`).classList.remove('active');
+    currentIndex = qIndex + 1;
+    document.getElementById(`q-${currentIndex}`).classList.add('active');
+    document.getElementById('current-q').textContent = currentIndex + 1;
+    document.getElementById('progress-fill').style.width = ((currentIndex + 1) / questions.length * 100) + '%';
+}
+
+function showResults() {
+    clearInterval(timerInterval);
+    document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+    document.querySelector('.progress-bar').style.display = 'none';
+    const results = document.getElementById('results');
+    results.style.display = 'block';
+
+    const pct = Math.round((correctCount / questions.length) * 100);
+    document.getElementById('final-score').textContent = pct + '%';
+    document.getElementById('final-score').className = 'score ' + (pct >= 66 ? 'pass' : 'fail');
+    document.getElementById('pass-fail-msg').textContent = pct >= 66 ? '🎉 PASSED! You scored above the 66% threshold.' : '❌ Not yet. You need 66% to pass. Keep practicing!';
+    document.getElementById('r-correct').textContent = correctCount;
+    document.getElementById('r-incorrect').textContent = questions.length - correctCount;
+    const m = Math.floor(timeElapsed / 60);
+    document.getElementById('r-time').textContent = m + ' min';
+}
+
+function resetExam() {
+    currentIndex = 0;
+    correctCount = 0;
+    answered = new Array(questions.length).fill(false);
+    timeElapsed = 0;
+    document.getElementById('results').style.display = 'none';
+    document.querySelector('.progress-bar').style.display = 'flex';
+    document.getElementById('questions-container').innerHTML = '';
+    init();
+}
+
+init();
+</script>
+</body>
+</html>
