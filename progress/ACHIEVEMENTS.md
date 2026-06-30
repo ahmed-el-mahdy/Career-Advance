@@ -32,12 +32,17 @@
 | Achievement | Impact |
 |------------|--------|
 | Stabilized 2 inherited platforms (Julfar + Mosadad) | Eliminated drift, secured state |
-| Operating 4 AKS clusters in production | 7 microservices, 4 environments |
+| Operating 4 AKS clusters in production | 7 microservices (Mosadad) + 12 (ActionAI), 4 environments |
+| Implemented 24 HPA policies | 6 services × 4 environments, tiered scaling guardrails |
+| Achieved 0 staging IaC drift | Terraform alignment across all environments |
+| Optimized Claims workload sizing | 1 vCPU / 2Gi — stable PDF processing |
+| Configured production monitoring | 4 alert rules + 3 availability tests |
 | Migrated CI/CD from GitLab to GitHub Actions | DRY reusable workflows |
 | Implemented Kustomize multi-env deployment | dev/qa/staging/prod |
 | Built GitHub Actions → ACR → AKS → APIM pipeline | Automated end-to-end |
-| Set up Grafana + Prometheus monitoring | Full observability |
+| Set up Grafana + Prometheus + App Insights | Full observability stack |
 | Implemented Key Vault CSI + WAF + Firewall | Production security |
+| Onboarded 12 microservices to ActionAI | Helm + Argo CD GitOps end-to-end |
 
 ---
 
