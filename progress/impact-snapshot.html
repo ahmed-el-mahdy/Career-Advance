@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ahmed ElMahdy — Impact Snapshot</title>
+<style>
+@page { size: A4; margin: 20mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1e293b; line-height: 1.5; max-width: 210mm; margin: 0 auto; padding: 20mm; background: #fff; }
+
+/* Header */
+.header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #1e40af; padding-bottom: 14px; margin-bottom: 20px; }
+.header h1 { font-size: 22px; font-weight: 800; color: #0f172a; }
+.header .role { font-size: 13px; color: #475569; margin-top: 2px; }
+.header .contact { text-align: right; font-size: 11px; color: #64748b; line-height: 1.8; }
+.header .contact a { color: #1e40af; text-decoration: none; }
+
+/* Section titles */
+h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #1e40af; margin-top: 22px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+
+/* Metrics grid */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 6px; }
+.metric { text-align: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 8px; }
+.metric-num { font-size: 28px; font-weight: 800; color: #1e40af; }
+.metric-label { font-size: 10px; color: #475569; margin-top: 2px; font-weight: 600; }
+.metric-desc { font-size: 9px; color: #94a3b8; margin-top: 2px; }
+
+/* Platforms table */
+table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 4px; }
+th { background: #f1f5f9; text-align: left; padding: 8px 10px; font-weight: 700; color: #334155; border-bottom: 2px solid #cbd5e1; }
+td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #475569; }
+td:first-child { font-weight: 600; color: #1e293b; }
+
+/* Scope section */
+.scope-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; font-size: 11px; }
+.scope-item { display: flex; gap: 6px; }
+.scope-item .label { font-weight: 700; color: #334155; min-width: 85px; }
+.scope-item .value { color: #64748b; }
+
+/* Certs */
+.certs { display: flex; gap: 12px; flex-wrap: wrap; }
+.cert { font-size: 10px; padding: 5px 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; color: #1e40af; font-weight: 600; }
+
+/* Footer */
+.footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 9px; color: #94a3b8; }
+
+@media print {
+    body { padding: 0; }
+    .metric { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h1>Ahmed ElMahdy</h1>
+        <div class="role">Platform / DevOps Engineer — 5+ Years Cloud & DevOps</div>
+    </div>
+    <div class="contact">
+        <a href="https://ahmed-el-mahdy.github.io">ahmed-el-mahdy.github.io</a><br>
+        <a href="https://github.com/ahmed-el-mahdy">github.com/ahmed-el-mahdy</a><br>
+        <a href="https://linkedin.com/in/ahmed-el-mahdy">linkedin.com/in/ahmed-el-mahdy</a>
+    </div>
+</div>
+
+<h2>Key Impact Metrics</h2>
+<div class="metrics">
+    <div class="metric">
+        <div class="metric-num">24</div>
+        <div class="metric-label">HPA Policies</div>
+        <div class="metric-desc">6 services × 4 environments</div>
+    </div>
+    <div class="metric">
+        <div class="metric-num">0</div>
+        <div class="metric-label">Staging IaC Drift</div>
+        <div class="metric-desc">Full Terraform alignment</div>
+    </div>
+    <div class="metric">
+        <div class="metric-num">4+3</div>
+        <div class="metric-label">Alerts + Availability</div>
+        <div class="metric-desc">Proactive monitoring</div>
+    </div>
+    <div class="metric">
+        <div class="metric-num">19</div>
+        <div class="metric-label">Microservices</div>
+        <div class="metric-desc">7 (Mosadad) + 12 (ActionAI)</div>
+    </div>
+</div>
+
+<h2>Platforms Under Management</h2>
+<table>
+    <tr><th>Platform</th><th>Stack</th><th>Scale</th></tr>
+    <tr>
+        <td>Mosadad (Insurance Recovery)</td>
+        <td>Azure AKS, Terraform, .NET 8, Angular 19</td>
+        <td>7 microservices, 4 AKS clusters, 4 envs</td>
+    </tr>
+    <tr>
+        <td>ActionAI (AI Automation)</td>
+        <td>Azure AKS, Helm, Argo CD, Kafka, .NET 8</td>
+        <td>12 microservices, 3 environments</td>
+    </tr>
+</table>
+
+<h2>Scope of Delivery</h2>
+<div class="scope-grid">
+    <div class="scope-item"><span class="label">Infrastructure</span><span class="value">Terraform modular IaC (AKS, APIM, App Service, Key Vault, networking, monitoring)</span></div>
+    <div class="scope-item"><span class="label">Kubernetes</span><span class="value">Kustomize overlays, HPA per service, NGINX ingress, CSI secret provider</span></div>
+    <div class="scope-item"><span class="label">Security</span><span class="value">WAF_v2, Azure Firewall, APIM rate limiting, Key Vault CSI, B2C/Entra ID</span></div>
+    <div class="scope-item"><span class="label">CI/CD</span><span class="value">GitHub Actions DRY workflows, Docker → ACR → AKS → APIM auto-import</span></div>
+    <div class="scope-item"><span class="label">Monitoring</span><span class="value">Grafana + Prometheus, App Insights APM, alert rules, availability tests</span></div>
+    <div class="scope-item"><span class="label">GitOps</span><span class="value">Argo CD app-of-apps, Helm umbrella chart, Kafka Strimzi operator</span></div>
+</div>
+
+<h2>Certifications</h2>
+<div class="certs">
+    <span class="cert">AWS Solutions Architect – Associate</span>
+    <span class="cert">AWS Cloud Practitioner</span>
+    <span class="cert">Microsoft SC-300 (Identity & Access)</span>
+    <span class="cert">McKinsey Forward Program</span>
+</div>
+
+<div class="footer">
+    Generated June 2026 — All metrics verified from production Kubernetes manifests and Terraform configurations
+</div>
+
+</body>
+</html>
