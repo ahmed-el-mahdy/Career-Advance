@@ -48,7 +48,42 @@
 
 ## Exam Prep Progress
 
-### CKA
+### CKA — Certified Kubernetes Administrator ($445, 2h online proctored)
+
+**Exam Domains & Weights:**
+
+| Domain | Weight | Your Strength |
+|--------|--------|---------------|
+| Troubleshooting | 30% | ⚡ Focus area — kubeadm cluster debugging |
+| Cluster Architecture, Installation & Configuration | 25% | ⚡ Focus area — kubeadm install/upgrade, etcd backup |
+| Services & Networking | 20% | ✅ Strong — Ingress, CoreDNS, CNI (daily AKS work) |
+| Workloads & Scheduling | 15% | ✅ Strong — HPA, deployments, ConfigMaps, Secrets |
+| Storage | 10% | ✅ Solid — PV, PVC, StorageClass |
+
+**Study Resources (ranked):**
+
+| # | Resource | Type | Link |
+|---|----------|------|------|
+| 1 | KodeKloud CKA Course (Mumshad) | Paid — best overall | https://kodekloud.com/courses/certified-kubernetes-administrator-cka/ |
+| 2 | Killer.sh CKA Simulator | Included with exam — 2 free sessions | https://killer.sh/cka |
+| 3 | Killercoda Free CKA Scenarios | Free practice labs | https://killercoda.com/cka |
+| 4 | CNCF Official Curriculum v1.35 | Exam objectives PDF | https://github.com/cncf/curriculum |
+| 5 | Walid Shaari's CKA GitHub (4.4k⭐) | Free — objectives linked to k8s.io docs | https://github.com/walidshaari/Kubernetes-Certified-Administrator |
+| 6 | Kubernetes Official Docs | Allowed during exam | https://kubernetes.io/docs/ |
+
+**Recap Strategy:**
+1. KodeKloud sections in weight order: Troubleshooting → Cluster Arch → Networking
+2. Complete every KodeKloud lab + lightning labs
+3. Killercoda free scenarios for daily practice
+4. Save both killer.sh sessions for last 2 weeks before exam
+5. Drill kubectl aliases + autocomplete speed
+
+**Exam Day Essentials:**
+- kubectl cheatsheet: https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+- `alias k=kubectl && complete -F __start_kubectl k`
+- `kubectl explain --recursive` for manifest construction
+- `kubectl get pods -o wide --show-labels -A` for quick triage
+
 | Week | Mock Score | Notes |
 |------|-----------|-------|
 | | | |

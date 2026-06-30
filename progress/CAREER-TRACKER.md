@@ -103,4 +103,17 @@
 
 ---
 
+---
+
+## 📜 Certification Roadmap
+
+| Priority | Certification | Status | Resource | Est. Exam |
+|----------|--------------|--------|----------|-----------|
+| 1 | CKA (Certified Kubernetes Administrator) | 📖 Studying | KodeKloud + killer.sh | TBD |
+| 2 | AZ-104 (Azure Administrator) | 📖 Studying | Manara training complete | TBD |
+| 3 | CKS (Certified Kubernetes Security) | ⬜ Next | After CKA | — |
+| 4 | Terraform Associate | ⬜ Planned | HashiCorp | — |
+
+---
+
 *Start applying NOW. Don't wait for CKA/AZ-104. Your experience is already senior-level.*
