@@ -88,13 +88,18 @@ td:first-child { font-weight: 600; color: #1e293b; }
     </div>
 </div>
 
-<h2>Platform Under Management</h2>
+<h2>Platforms Under Management</h2>
 <table>
     <tr><th>Platform</th><th>Stack</th><th>Scale</th></tr>
     <tr>
         <td>Mosadad (Insurance Recovery)</td>
         <td>Azure AKS, Terraform, .NET 8, Angular 19, MongoDB, Redis</td>
         <td>7 microservices, 2 frontends, 4 AKS clusters, 4 environments</td>
+    </tr>
+    <tr>
+        <td>ActionAI (AI Automation)</td>
+        <td>Azure AKS, Helm, Argo CD, GitHub Actions, APIM, Key Vault</td>
+        <td>1 microservice onboarded E2E, platform docs &amp; cleanup</td>
     </tr>
 </table>
 
@@ -106,6 +111,8 @@ td:first-child { font-weight: 600; color: #1e293b; }
     <div class="scope-item"><span class="label">CI/CD</span><span class="value">GitHub Actions DRY workflows, Docker → ACR → AKS → APIM auto-import</span></div>
     <div class="scope-item"><span class="label">Monitoring</span><span class="value">Grafana + Prometheus, App Insights APM, alert rules, availability tests</span></div>
     <div class="scope-item"><span class="label">Data</span><span class="value">MongoDB, Redis Cache, CosmosDB, Azure Blob Storage, B2C auth</span></div>
+    <div class="scope-item"><span class="label">GitOps</span><span class="value">Argo CD, Helm umbrella chart, 1 microservice onboarded E2E (repo → CI/CD → Helm → Argo → APIM)</span></div>
+    <div class="scope-item"><span class="label">Documentation</span><span class="value">Platform cleanup, READMEs, Confluence, architecture diagrams, handover readiness</span></div>
 </div>
 
 <h2>Certifications</h2>
