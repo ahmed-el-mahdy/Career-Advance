@@ -4,9 +4,9 @@
 
 ---
 
-## Post 1: Platform Reliability (use existing GIF)
+## Post 1: Platform Reliability
 
-**Media:** `assets/linkedin-post1-before-after.gif`
+**Media:** Open `assets/linkedin-post1-before-after.html` in browser → screen-record the animation → export as GIF
 
 **Text:**
 
