@@ -37,9 +37,19 @@ career-advance/
 ├── labs/
 │   ├── WEEKLY-SCHEDULE.md ← Daily study tracker
 │   └── LAB-SETUP.md       ← Local lab environment setup
-└── progress/
-    ├── CAREER-TRACKER.md  ← Job applications & interviews
-    └── ACHIEVEMENTS.md    ← Completed certifications & skills
+├── progress/
+│   ├── CAREER-TRACKER.md  ← Job applications & interviews
+│   ├── ACHIEVEMENTS.md    ← Completed certifications & skills
+│   ├── IMPACT-SNAPSHOT.md ← Quantified production impact
+│   ├── CV-BULLETS.md      ← Ready-to-use CV bullet points
+│   ├── STAR-ANSWERS.md    ← Interview STAR stories
+│   └── LINKEDIN-POSTS.md  ← LinkedIn content drafts
+└── roadmap/               ← Internal docs (moved from portfolio repo)
+    ├── ROADMAP.md             ← Long-term career roadmap
+    ├── CAREER-DEVELOPMENT.md  ← Development plan & skill gaps
+    ├── JOURNEY-AND-PERFORMANCE.md ← Career journey & performance log
+    ├── PLATFORM-OVERVIEW.md   ← Mosadad platform architecture notes
+    └── ENVIRONMENT-MATRIX.md  ← Environments & infrastructure matrix
 ```
 
 ## 🔗 Quick Links
@@ -61,4 +71,4 @@ career-advance/
 4. **Target roles**: Senior DevOps, Platform Engineer, Cloud Architect (Remote/UAE/KSA/Egypt)
 
 ---
-*Last updated: June 2026*
+*Last updated: July 2026*
