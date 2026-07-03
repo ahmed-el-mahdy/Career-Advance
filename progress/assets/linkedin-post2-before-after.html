@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IaC Drift — Before & After</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.container { width: 800px; padding: 40px; }
+.title { text-align: center; color: #e2e8f0; font-size: 24px; font-weight: 700; margin-bottom: 30px; }
+.title span { color: #a78bfa; }
+.panels { display: flex; gap: 20px; }
+.panel { flex: 1; border-radius: 12px; padding: 24px; position: relative; overflow: hidden; }
+.panel.before { background: #1e1b2e; border: 2px solid #ef4444; }
+.panel.after { background: #1e1b2e; border: 2px solid #22c55e; }
+.panel-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+.panel.before .panel-label { color: #ef4444; }
+.panel.after .panel-label { color: #22c55e; }
+.item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; color: #cbd5e1; font-size: 13px; line-height: 1.5; }
+.item .icon { flex-shrink: 0; width: 20px; text-align: center; font-size: 14px; }
+.terminal { margin-top: 20px; background: #0d1117; border-radius: 8px; padding: 16px; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 11px; border: 1px solid #30363d; }
+.terminal .prompt { color: #7ee787; }
+.terminal .cmd { color: #e6edf3; }
+.terminal .output { color: #8b949e; margin-top: 6px; }
+.terminal .success { color: #3fb950; font-weight: 700; }
+.terminal .error { color: #f85149; }
+.drift-counter { text-align: center; margin-top: 24px; }
+.drift-num { font-size: 64px; font-weight: 800; }
+.panel.before .drift-num { color: #ef4444; }
+.panel.after .drift-num { color: #22c55e; }
+.drift-label { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+
+/* Animation */
+.panel.before { animation: fadeSlide 0.8s ease-out; }
+.panel.after { animation: fadeSlide 0.8s ease-out 0.4s both; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="title">Terraform Alignment: <span>Before & After</span></div>
+    <div class="panels">
+        <div class="panel before">
+            <div class="panel-label">Before</div>
+            <div class="item"><span class="icon">❌</span> Module versions diverged between envs</div>
+            <div class="item"><span class="icon">❌</span> Manual portal changes = silent drift</div>
+            <div class="item"><span class="icon">❌</span> "Works in staging" ≠ works in prod</div>
+            <div class="item"><span class="icon">❌</span> Team afraid to run terraform apply</div>
+            <div class="terminal">
+                <div><span class="prompt">$ </span><span class="cmd">terraform plan -out=staging.plan</span></div>
+                <div class="output">Plan: <span class="error">14 to change, 3 to destroy</span></div>
+                <div class="output"><span class="error">⚠ Unexpected drift detected</span></div>
+            </div>
+            <div class="drift-counter">
+                <div class="drift-num">14</div>
+                <div class="drift-label">unplanned changes</div>
+            </div>
+        </div>
+        <div class="panel after">
+            <div class="panel-label">After</div>
+            <div class="item"><span class="icon">✅</span> All envs aligned to same modules</div>
+            <div class="item"><span class="icon">✅</span> No manual changes — IaC is source of truth</div>
+            <div class="item"><span class="icon">✅</span> Staging reliably predicts production</div>
+            <div class="item"><span class="icon">✅</span> Team ships with confidence</div>
+            <div class="terminal">
+                <div><span class="prompt">$ </span><span class="cmd">terraform plan -out=staging.plan</span></div>
+                <div class="output">Plan: <span class="success">0 to add, 0 to change, 0 to destroy</span></div>
+                <div class="output"><span class="success">✓ No changes. Infrastructure is up-to-date.</span></div>
+            </div>
+            <div class="drift-counter">
+                <div class="drift-num">0</div>
+                <div class="drift-label">drift — fully aligned</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

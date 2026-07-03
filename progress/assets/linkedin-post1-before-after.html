@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HPA Autoscaling — Before & After</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.container { width: 820px; padding: 40px; }
+.title { text-align: center; color: #e2e8f0; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.title span { color: #60a5fa; }
+.subtitle { text-align: center; color: #94a3b8; font-size: 12px; margin-bottom: 32px; }
+.panels { display: flex; gap: 20px; }
+.panel { flex: 1; border-radius: 12px; padding: 24px; }
+.panel.before { background: #1e1b2e; border: 2px solid #ef4444; }
+.panel.after { background: #1e1b2e; border: 2px solid #22c55e; }
+.panel-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+.panel.before .panel-label { color: #ef4444; }
+.panel.after .panel-label { color: #22c55e; }
+
+.item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; color: #cbd5e1; font-size: 12px; line-height: 1.5; }
+.item .icon { flex-shrink: 0; width: 18px; text-align: center; font-size: 13px; }
+
+/* Pod visualization */
+.pods-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0; }
+.pod { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; }
+.pod.fixed { background: #7f1d1d; border: 1px solid #ef4444; }
+.pod.scaled { background: #14532d; border: 1px solid #22c55e; }
+.pod.crashed { background: #7f1d1d; border: 1px solid #ef4444; opacity: 0.5; position: relative; }
+.pod.crashed::after { content: '✕'; position: absolute; font-size: 14px; color: #ef4444; }
+
+/* HPA bar */
+.hpa-bar { background: #0d1117; border-radius: 8px; padding: 12px 14px; margin-top: 14px; border: 1px solid #30363d; }
+.hpa-bar .label { font-size: 9px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.hpa-bar .value { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.panel.before .hpa-bar .value { color: #f87171; }
+.panel.after .hpa-bar .value { color: #4ade80; }
+
+/* Stats */
+.stat-row { display: flex; gap: 12px; margin-top: 16px; }
+.stat { flex: 1; text-align: center; background: #0d1117; border-radius: 8px; padding: 12px 8px; border: 1px solid #30363d; }
+.stat-num { font-size: 22px; font-weight: 800; }
+.panel.before .stat-num { color: #ef4444; }
+.panel.after .stat-num { color: #22c55e; }
+.stat-label { font-size: 9px; color: #94a3b8; margin-top: 2px; }
+
+/* Bottom badge */
+.badge-row { margin-top: 24px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.badge { font-size: 10px; padding: 5px 10px; border-radius: 999px; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); color: #93c5fd; }
+
+/* Animation */
+.panel.before { animation: slideIn 0.6s ease-out; }
+.panel.after { animation: slideIn 0.6s ease-out 0.5s both; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+.badge-row { animation: fadeUp 0.5s ease-out 1s both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="title">Kubernetes Autoscaling: <span>Before & After</span></div>
+    <div class="subtitle">6 services × 4 environments = 24 HPA policies</div>
+
+    <div class="panels">
+        <div class="panel before">
+            <div class="panel-label">❌ Before — Fixed Replicas</div>
+            <div class="item"><span class="icon">⚠️</span> All pods at fixed replica=1</div>
+            <div class="item"><span class="icon">💀</span> OOM kills during traffic spikes</div>
+            <div class="item"><span class="icon">💸</span> Same resources idle vs peak</div>
+            <div class="item"><span class="icon">🔥</span> Claims PDF processing crashes</div>
+
+            <div class="pods-row">
+                <div class="pod fixed">1</div>
+                <div class="pod crashed"></div>
+                <div class="pod fixed">1</div>
+                <div class="pod fixed">1</div>
+                <div class="pod crashed"></div>
+                <div class="pod fixed">1</div>
+            </div>
+
+            <div class="hpa-bar">
+                <div class="label">Autoscaling</div>
+                <div class="value">❌ None — manual scaling only</div>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="stat-num">0</div>
+                    <div class="stat-label">HPA policies</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">?</div>
+                    <div class="stat-label">incidents/month</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel after">
+            <div class="panel-label">✅ After — Tiered HPA</div>
+            <div class="item"><span class="icon">📈</span> Auto-scales on CPU 70% target</div>
+            <div class="item"><span class="icon">🛡️</span> Environment-specific max replicas</div>
+            <div class="item"><span class="icon">⚡</span> Claims tuned: 1 vCPU / 2Gi</div>
+            <div class="item"><span class="icon">✅</span> Zero scaling incidents since deploy</div>
+
+            <div class="pods-row">
+                <div class="pod scaled">1</div>
+                <div class="pod scaled">2</div>
+                <div class="pod scaled">1</div>
+                <div class="pod scaled">2</div>
+                <div class="pod scaled">3</div>
+                <div class="pod scaled">1</div>
+                <div class="pod scaled">4</div>
+                <div class="pod scaled">2</div>
+            </div>
+
+            <div class="hpa-bar">
+                <div class="label">HPA Config (per env)</div>
+                <div class="value">dev: max=2 | qa: max=3 | staging/prod: max=4</div>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="stat-num">24</div>
+                    <div class="stat-label">HPA policies</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">0</div>
+                    <div class="stat-label">scaling incidents</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="badge-row">
+        <span class="badge">Azure AKS</span>
+        <span class="badge">Kustomize</span>
+        <span class="badge">HorizontalPodAutoscaler</span>
+        <span class="badge">.NET 8</span>
+        <span class="badge">4 Environments</span>
+    </div>
+</div>
+</body>
+</html>

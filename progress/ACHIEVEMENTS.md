@@ -17,6 +17,10 @@
 
 | Date | Achievement |
 |------|------------|
+| Jul 2026 | Production performance analysis (MongoDB indexing, Redis audit, query optimization) |
+| Jul 2026 | Production AKS upgraded: B2s → D4ds_v5, cluster autoscaling 2-5 nodes |
+| Jul 2026 | APIM upgraded: Developer → StandardV2_1 (production-grade SLA) |
+| Jul 2026 | Terraform PROD fully aligned (4 add/3 change/0 destroy) |
 | Jun 2026 | Portfolio website live (ahmed-el-mahdy.github.io) |
 | Jun 2026 | GitHub profile optimized (4 showcase repos, README, pins) |
 | Jun 2026 | LinkedIn profile revamped for Senior DevOps targeting |
@@ -35,6 +39,9 @@
 | Operating 4 AKS clusters in production | 7 microservices (Mosadad) + 12 (ActionAI), 4 environments |
 | Implemented 24 HPA policies | 6 services × 4 environments, tiered scaling guardrails |
 | Achieved 0 staging IaC drift | Terraform alignment across all environments |
+| Prod Terraform fully aligned | 0 drift, safe apply capability |
+| Upgraded prod AKS to D4ds_v5 | 4 vCPU/16GB per node, autoscaling 2-5 nodes |
+| Upgraded APIM to StandardV2 | Production SLA, VNet integration ready |
 | Optimized Claims workload sizing | 1 vCPU / 2Gi — stable PDF processing |
 | Configured production monitoring | 4 alert rules + 3 availability tests |
 | Migrated CI/CD from GitLab to GitHub Actions | DRY reusable workflows |
@@ -42,6 +49,8 @@
 | Built GitHub Actions → ACR → AKS → APIM pipeline | Automated end-to-end |
 | Set up Grafana + Prometheus + App Insights | Full observability stack |
 | Implemented Key Vault CSI + WAF + Firewall | Production security |
+| Conducted MongoDB performance analysis | Identified 13 issues: zero indexes, 0.007% Redis hit rate, N+1 queries |
+| VNet network redesign (prod) | 8 purpose-specific subnets with NSG isolation |
 | Onboarded 12 microservices to ActionAI | Helm + Argo CD GitOps end-to-end |
 
 ---
