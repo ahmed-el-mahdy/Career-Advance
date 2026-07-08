@@ -52,7 +52,7 @@
 
 | # | Date | Company | Role | Status | Notes |
 |---|------|---------|------|--------|-------|
-| 1 | | | | ⬜ Applied | |
+| 1 | Jul 2026 | LinkedIn Application | DevOps/Platform Engineer | 🔵 Technical Interview | Interview: Sunday Jul 13, 2026 |
 | 2 | | | | ⬜ Applied | |
 | 3 | | | | ⬜ Applied | |
 

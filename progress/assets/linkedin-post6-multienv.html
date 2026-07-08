@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Multi-Environment Strategy — Before & After</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.container { width: 820px; padding: 40px; }
+.title { text-align: center; color: #e2e8f0; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.title span { color: #a78bfa; }
+.subtitle { text-align: center; color: #94a3b8; font-size: 12px; margin-bottom: 32px; }
+.panels { display: flex; gap: 20px; }
+.panel { flex: 1; border-radius: 12px; padding: 24px; }
+.panel.before { background: #1e1b2e; border: 2px solid #ef4444; }
+.panel.after { background: #1e1b2e; border: 2px solid #22c55e; }
+.panel-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+.panel.before .panel-label { color: #ef4444; }
+.panel.after .panel-label { color: #22c55e; }
+.item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; color: #cbd5e1; font-size: 12px; line-height: 1.5; }
+.item .icon { flex-shrink: 0; width: 18px; text-align: center; font-size: 13px; }
+
+/* Environment grid */
+.env-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 14px 0; }
+.env-cell { padding: 8px; border-radius: 6px; text-align: center; font-size: 9px; font-weight: 700; color: #fff; }
+.env-cell.chaos { background: #7f1d1d; border: 1px solid #ef4444; }
+.env-cell.aligned { background: #14532d; border: 1px solid #22c55e; }
+.env-label { font-size: 8px; color: #94a3b8; margin-top: 2px; }
+
+/* Kustomize tree */
+.tree { background: #0d1117; border-radius: 8px; padding: 12px 14px; margin-top: 14px; border: 1px solid #30363d; font-family: 'JetBrains Mono', monospace; font-size: 10px; line-height: 1.8; }
+.tree-ok { color: #4ade80; }
+.tree-bad { color: #f87171; }
+.tree-dim { color: #475569; }
+
+/* Stats */
+.stat-row { display: flex; gap: 12px; margin-top: 16px; }
+.stat { flex: 1; text-align: center; background: #0d1117; border-radius: 8px; padding: 12px 8px; border: 1px solid #30363d; }
+.stat-num { font-size: 22px; font-weight: 800; }
+.panel.before .stat-num { color: #ef4444; }
+.panel.after .stat-num { color: #22c55e; }
+.stat-label { font-size: 9px; color: #94a3b8; margin-top: 2px; }
+
+/* Bottom badge */
+.badge-row { margin-top: 24px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.badge { font-size: 10px; padding: 5px 10px; border-radius: 999px; background: rgba(167, 139, 250, 0.1); border: 1px solid rgba(167, 139, 250, 0.3); color: #c4b5fd; }
+
+/* Animation */
+.panel.before { animation: slideIn 0.6s ease-out; }
+.panel.after { animation: slideIn 0.6s ease-out 0.5s both; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+.badge-row { animation: fadeUp 0.5s ease-out 1s both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="title">Multi-Environment K8s: <span>Kustomize Overlays</span></div>
+    <div class="subtitle">One base → 4 environments → 6 services = zero config drift</div>
+
+    <div class="panels">
+        <div class="panel before">
+            <div class="panel-label">❌ Before — Config Snowflakes</div>
+            <div class="item"><span class="icon">❄️</span> Each env had unique YAML files</div>
+            <div class="item"><span class="icon">🔀</span> Dev didn't match QA structure</div>
+            <div class="item"><span class="icon">📋</span> Manual copy-paste between envs</div>
+            <div class="item"><span class="icon">🐛</span> "Works in dev, breaks in staging"</div>
+
+            <div class="env-grid">
+                <div class="env-cell chaos">DEV<div class="env-label">custom yamls</div></div>
+                <div class="env-cell chaos">QA<div class="env-label">different structure</div></div>
+                <div class="env-cell chaos">STAGING<div class="env-label">out of sync</div></div>
+                <div class="env-cell chaos">PROD<div class="env-label">manual patches</div></div>
+            </div>
+
+            <div class="tree">
+<span class="tree-bad">├── dev-deployment.yaml</span><br>
+<span class="tree-bad">├── qa-deployment-v2.yaml</span><br>
+<span class="tree-bad">├── staging-deployment-final.yaml</span><br>
+<span class="tree-bad">├── prod-deployment-fixed.yaml</span><br>
+<span class="tree-dim"># No shared base, no inheritance</span>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="stat-num">24+</div>
+                    <div class="stat-label">unique YAML files</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">?</div>
+                    <div class="stat-label">config drift issues</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel after">
+            <div class="panel-label">✅ After — Kustomize Overlays</div>
+            <div class="item"><span class="icon">📦</span> Shared base templates</div>
+            <div class="item"><span class="icon">🎯</span> Per-env patches only (what differs)</div>
+            <div class="item"><span class="icon">🔁</span> Promote by merging overlays</div>
+            <div class="item"><span class="icon">✅</span> All envs inherit same structure</div>
+
+            <div class="env-grid">
+                <div class="env-cell aligned">DEV<div class="env-label">overlay</div></div>
+                <div class="env-cell aligned">QA<div class="env-label">overlay</div></div>
+                <div class="env-cell aligned">STAGING<div class="env-label">overlay</div></div>
+                <div class="env-cell aligned">PROD<div class="env-label">overlay</div></div>
+            </div>
+
+            <div class="tree">
+<span class="tree-ok">├── base/</span><br>
+<span class="tree-dim">│   ├── deployment.yaml</span><br>
+<span class="tree-dim">│   ├── service.yaml</span><br>
+<span class="tree-dim">│   └── kustomization.yaml</span><br>
+<span class="tree-ok">└── overlays/{dev,qa,staging,prod}/</span><br>
+<span class="tree-dim">&nbsp;&nbsp;&nbsp;&nbsp;└── patches + configmap</span>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="stat-num">1</div>
+                    <div class="stat-label">shared base</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">0</div>
+                    <div class="stat-label">config drift</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="badge-row">
+        <span class="badge">Kustomize</span>
+        <span class="badge">GitOps</span>
+        <span class="badge">4 Environments</span>
+        <span class="badge">6 Microservices</span>
+        <span class="badge">AKS</span>
+    </div>
+</div>
+</body>
+</html>

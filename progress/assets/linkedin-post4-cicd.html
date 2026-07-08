@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CI/CD Pipeline — Before & After</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.container { width: 820px; padding: 40px; }
+.title { text-align: center; color: #e2e8f0; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.title span { color: #60a5fa; }
+.subtitle { text-align: center; color: #94a3b8; font-size: 12px; margin-bottom: 32px; }
+.panels { display: flex; gap: 20px; }
+.panel { flex: 1; border-radius: 12px; padding: 24px; }
+.panel.before { background: #1e1b2e; border: 2px solid #ef4444; }
+.panel.after { background: #1e1b2e; border: 2px solid #22c55e; }
+.panel-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+.panel.before .panel-label { color: #ef4444; }
+.panel.after .panel-label { color: #22c55e; }
+.item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; color: #cbd5e1; font-size: 12px; line-height: 1.5; }
+.item .icon { flex-shrink: 0; width: 18px; text-align: center; font-size: 13px; }
+
+/* Pipeline visualization */
+.pipeline { display: flex; align-items: center; gap: 4px; margin: 14px 0; flex-wrap: wrap; }
+.stage { padding: 6px 10px; border-radius: 6px; font-size: 9px; font-weight: 700; color: #fff; }
+.stage.manual { background: #7f1d1d; border: 1px solid #ef4444; }
+.stage.auto { background: #14532d; border: 1px solid #22c55e; }
+.arrow { color: #475569; font-size: 12px; }
+
+/* Code block */
+.code-block { background: #0d1117; border-radius: 8px; padding: 12px 14px; margin-top: 14px; border: 1px solid #30363d; font-family: 'JetBrains Mono', monospace; font-size: 10px; line-height: 1.6; }
+.panel.before .code-block { color: #f87171; }
+.panel.after .code-block { color: #4ade80; }
+
+/* Stats */
+.stat-row { display: flex; gap: 12px; margin-top: 16px; }
+.stat { flex: 1; text-align: center; background: #0d1117; border-radius: 8px; padding: 12px 8px; border: 1px solid #30363d; }
+.stat-num { font-size: 22px; font-weight: 800; }
+.panel.before .stat-num { color: #ef4444; }
+.panel.after .stat-num { color: #22c55e; }
+.stat-label { font-size: 9px; color: #94a3b8; margin-top: 2px; }
+
+/* Bottom badge */
+.badge-row { margin-top: 24px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.badge { font-size: 10px; padding: 5px 10px; border-radius: 999px; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); color: #93c5fd; }
+
+/* Animation */
+.panel.before { animation: slideIn 0.6s ease-out; }
+.panel.after { animation: slideIn 0.6s ease-out 0.5s both; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+.badge-row { animation: fadeUp 0.5s ease-out 1s both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="title">CI/CD Pipeline: <span>Before & After</span></div>
+    <div class="subtitle">From copy-paste YAML to DRY reusable workflows across 9 repositories</div>
+
+    <div class="panels">
+        <div class="panel before">
+            <div class="panel-label">❌ Before — Manual & Fragmented</div>
+            <div class="item"><span class="icon">📋</span> Copy-paste workflow per repo</div>
+            <div class="item"><span class="icon">🔓</span> Secrets hardcoded in YAML</div>
+            <div class="item"><span class="icon">⏱️</span> Manual APIM import after deploy</div>
+            <div class="item"><span class="icon">🔀</span> No branch strategy enforcement</div>
+
+            <div class="pipeline">
+                <span class="stage manual">Push</span>
+                <span class="arrow">→</span>
+                <span class="stage manual">Build</span>
+                <span class="arrow">→</span>
+                <span class="stage manual">Manual Deploy</span>
+                <span class="arrow">→</span>
+                <span class="stage manual">Manual APIM</span>
+            </div>
+
+            <div class="code-block">
+# Different workflow per repo<br>
+# No reuse, no standards<br>
+# APIM updated via Azure Portal<br>
+# "It works on my machine" deploys
+            </div>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="stat-num">9</div>
+                    <div class="stat-label">duplicate workflows</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">~30m</div>
+                    <div class="stat-label">manual steps/deploy</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel after">
+            <div class="panel-label">✅ After — DRY & Automated</div>
+            <div class="item"><span class="icon">♻️</span> Reusable workflow templates</div>
+            <div class="item"><span class="icon">🔐</span> Key Vault + environment secrets</div>
+            <div class="item"><span class="icon">🤖</span> Auto APIM swagger import</div>
+            <div class="item"><span class="icon">🛡️</span> Branch guard enforcement</div>
+
+            <div class="pipeline">
+                <span class="stage auto">Push</span>
+                <span class="arrow">→</span>
+                <span class="stage auto">Docker Build</span>
+                <span class="arrow">→</span>
+                <span class="stage auto">ACR Push</span>
+                <span class="arrow">→</span>
+                <span class="stage auto">AKS Deploy</span>
+                <span class="arrow">→</span>
+                <span class="stage auto">APIM Import</span>
+            </div>
+
+            <div class="code-block">
+# git push → full deployment<br>
+# Docker → ACR → AKS → APIM<br>
+# 4 environments: dev/qa/staging/prod<br>
+# Zero manual intervention
+            </div>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="stat-num">1</div>
+                    <div class="stat-label">reusable template</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">0</div>
+                    <div class="stat-label">manual steps</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="badge-row">
+        <span class="badge">GitHub Actions</span>
+        <span class="badge">Docker</span>
+        <span class="badge">Azure ACR</span>
+        <span class="badge">AKS</span>
+        <span class="badge">APIM Auto-Import</span>
+    </div>
+</div>
+</body>
+</html>
